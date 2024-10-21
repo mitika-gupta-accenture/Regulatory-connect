@@ -1,0 +1,90 @@
+name: Node Pipeline - FA02
+# on:
+#   push:
+#     branches:
+#        - feature/**
+#        - develop
+#     paths:
+#        - backend/jobs/src/**
+#        - .github/workflows/node**
+
+on:
+  workflow_dispatch:
+
+jobs:
+  Build:
+    uses: ./.github/workflows/node-app-ci.yml
+    with:
+      NODE_VERSION: '20.x'
+      artifact_destination: 'GH'
+      src_path: 'backend/jobs/src'
+      app_name: 'rc-node-app-02'
+
+  SonarQube:
+    needs: Build
+    uses: ./.github/workflows/node-app-sonarqube-scan.yml
+    with:
+      src_path: 'backend/jobs/src'
+      app_name: 'rc-node-app-02'
+    secrets:
+      SonarAccessToken: ${{ secrets.SONAR_TOKEN }}
+
+  OWASP-Scan:
+    needs: Build
+    uses: ./.github/workflows/node-app-owasp-scan.yml
+    with:
+      src_path: 'backend/jobs/src'
+      app_name: 'rc-node-app-02'
+
+  # Smoke-Test:
+  #   needs: SonarQube
+  #   uses: ./.github/workflows/node-app-cypress.yml
+
+  Apply-App-Settings:
+    needs: SonarQube
+    uses: ./.github/workflows/node-app-config.yml
+    with:
+      environment: 'DEV'
+      CONFIG_TYPE: 'dev'
+      FUNCTION_APP_NAME: 'fa-rms-dev-uks-02'
+      resource_group: 'rg-mhra-dev-uks-rms'
+      config_path: 'backend/jobs'
+    secrets:
+      AZURE_CREDENTIALS_RC: ${{ secrets.AZURE_CREDENTIALS_RC }}
+
+  Dev:
+    needs: Apply-App-Settings
+    uses: ./.github/workflows/node-app-deploy.yml
+    with: 
+      environment: 'Dev'
+      FUNCTION_APP_NAME: 'fa-rms-dev-uks-02'
+      resource_group: 'rg-mhra-dev-uks-rms'
+      src_path: 'backend/jobs/src'
+      app_name: 'rc-node-app-02'
+      keyvault_name: 'kvrms01devuks'
+      config_path: 'backend/jobs'
+    secrets:
+      AZURE_CREDENTIALS_RC: ${{ secrets.AZURE_CREDENTIALS_RC }}
+      REPO_READ_PAT: ${{ secrets.REPO_READ_PAT }}
+
+  App-SQL-Access:
+    if: startsWith( github.ref, 'refs/heads/feature' )
+    needs: Dev
+    uses: ./.github/workflows/node-app-run-sql.yml
+    with: 
+      environment: 'Dev'
+      FUNCTION_APP_NAME: '["fa-rms-dev-uks-02"]'
+      slotname: ${{ needs.Dev.outputs.slotname }}
+      grantaccess: "true"
+    secrets:
+      AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      AZURE_CREDENTIALS_RC: ${{ secrets.AZURE_CREDENTIALS_RC }}
+
+  DAST:
+    needs: Dev
+    uses: ./.github/workflows/node-app-DAST.yml
+    with:
+      APP_URL: ${{ needs.Dev.outputs.appurl }}
+      environment: 'Dev'

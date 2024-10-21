@@ -1,0 +1,66 @@
+[
+  {
+    "sectionName": "Seller's details",
+    "identifier": "seller-name",
+    "question": "Do you know the name of the seller or the website address?",
+    "fields": [
+      {
+        "identifier": "seller-details-name",
+        "type": "text",
+        "label": "Name of the seller of their website (optional)",
+        "errorMessage": "Fill in the text box",
+        "size": 20
+      },
+      {
+        "type": "details",
+        "heading": "How can I find the website address?",
+        "fields": [
+          {
+            "type": "paragraph",
+            "content": [
+              "Find the seller's website.",
+              "You can copy the address from the search bar in your browser.",
+              "<img width='80%' src='/source-help.png'/>"
+            ]
+          }
+        ]
+      },
+      {
+        "identifier": "seller-details-do-you-have-website",
+        "type": "radio",
+        "validations": [
+          {
+            "required": "Confirm if you know the seller's name or their website address"
+          }
+        ],
+        "answers": [
+          {
+            "value": "Yes, I know the website address (URL)",
+            "route": "evidence-of-seller",
+            "fields": [
+              {
+                "identifier": "link-to-sellers-website",
+                "type": "text",
+                "label": "Link",
+                "validations": [
+                  {
+                    "required": "Enter the seller's website address",
+                    "url-malformed": "Please enter a valid URL link"
+                  }
+                ],
+                "exampleAnswer": "For example, www.gov.uk/page/1234/content#",
+                "errorMessage": "Please enter a valid URL link",
+                "size": 20,
+                "formatType": ["trimURL"]
+              }
+            ]
+          },
+          {
+            "value": "No",
+            "route": "evidence-of-seller"
+          }
+        ]
+      }
+    ]
+  }
+]

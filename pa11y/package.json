@@ -1,0 +1,9 @@
+{
+  "name": "pa11y",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "pa11y": "^6.2.3"
+  }
+}

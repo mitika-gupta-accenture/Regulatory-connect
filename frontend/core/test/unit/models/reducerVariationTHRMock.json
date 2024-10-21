@@ -1,0 +1,39 @@
+{
+  "answersArr": {
+    "answers": [
+      {
+        "type": "answer",
+        "question": "Does your application relate to:",
+        "answer": "THR",
+        "number": 0
+      },
+      {
+        "type": "answer",
+        "question": "Does your application relate to a change in the formulation of a traditional herbal registration to introduce a new excipient?",
+        "answer": "No",
+        "number": 3
+      },
+      {
+        "type": "answer",
+        "question": "Does your application relate to a change which involves the addition of one or more:",
+        "answer": "No",
+        "number": 7
+      },
+      {
+        "type": "answer",
+        "question": "Does your application relate to an administrative change to:",
+        "answer": "No",
+        "number": 8
+      }
+    ],
+    "keyPoints": [
+      {
+        "type": "key point",
+        "question": "Does your application relate to an administrative change to:",
+        "identifier": "feeType",
+        "answer": "THR Standard",
+        "number": 8
+      }
+    ]
+  }
+}

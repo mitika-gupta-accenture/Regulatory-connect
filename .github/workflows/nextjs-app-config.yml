@@ -1,0 +1,70 @@
+name: webapp  Config
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+      AZURE_WEBAPP_NAME:
+        required: true
+        type: string
+      resource_group:
+        required: true
+        type: string
+      config_path:
+        required: true
+        type: string
+      slot_name_r2:
+        required: false
+        type: string  
+    secrets:
+      AZURE_CREDENTIALS_RC:
+        required: false 
+
+jobs:
+  Config-Update:
+    runs-on: gp-prod-runner-set
+    env:
+      branch_name: ${{ github.event.ref }}${{ github.event.pull_request.head.ref }}
+    environment:
+      name: ${{ inputs.environment }}
+    steps:
+      - name: "Validate Branch Ref"
+        run: |
+          if [[ ${{ env.branch_name }} =~ ^feature/ || ${{ env.branch_name }} =~ ^hotfix/ || ${{ env.branch_name }} =~ ^fix/ ]]
+          then
+            echo "Event Triggered Branch is a dynamic branch, Not Applying Appsetting to main slot"
+            echo "Skip_Apply_Appsetting=true" >> $GITHUB_ENV
+          fi
+
+      - name: "Cleaning up Workspace"
+        if: ${{ env.Skip_Apply_Appsetting != 'true' }}
+        working-directory: ${{ github.workspace }}
+        run: |
+          echo "Cleaning up previous run"
+          rm -rf *
+          ls -al '${{ github.workspace }}'
+
+      - name: "Log in with Azure 🆔"
+        if: ${{ env.Skip_Apply_Appsetting != 'true' }}
+        uses: azure/login@v2
+        with:
+          creds: "${{ secrets.AZURE_CREDENTIALS_RC }}"
+
+      - name: "Checkout Code ☁️"
+        if: ${{ env.Skip_Apply_Appsetting != 'true' }}
+        uses: actions/checkout@v4
+        
+      - name: Apply webapp configuration
+        if: ${{ env.Skip_Apply_Appsetting != 'true' }}
+        working-directory: ${{ inputs.config_path }}
+        run: |
+          env_name=$(echo ${{ inputs.environment }} | tr '[:upper:]' '[:lower:]')
+          echo "AppSettings Config File: ${env_name}_config.json"
+          
+          if [ "${{ inputs.environment }}" == "PRE-UAT" ]
+          then
+            az webapp config appsettings set -g ${{ inputs.resource_group }} -n ${{ inputs.AZURE_WEBAPP_NAME }} --slot ${{ inputs.slot_name_r2 }} --settings @"${env_name}_config.json"
+          else
+            az webapp config appsettings set -g ${{ inputs.resource_group }} -n ${{ inputs.AZURE_WEBAPP_NAME }} --settings @"${env_name}_config.json"
+          fi

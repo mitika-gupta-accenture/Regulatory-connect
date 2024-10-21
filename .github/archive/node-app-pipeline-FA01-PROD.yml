@@ -1,0 +1,66 @@
+name: Node Pipeline - FA01 for PROD deployment
+# on:
+#   push:
+#     tags:
+#        - 'v*.*.*'
+
+on:
+  workflow_dispatch:
+  
+jobs:
+  Build:
+    uses: ./.github/workflows/node-app-ci.yml
+    with:
+      NODE_VERSION: '20.x'
+      artifact_destination: 'GH'
+      src_path: 'backend/api/src'
+      app_name: 'rc-node-app-01'
+
+  Apply-App-Settings:
+    needs: Build
+    uses: ./.github/workflows/node-app-config.yml
+    with:
+      environment: 'Prod'
+      CONFIG_TYPE: 'prod'
+      FUNCTION_APP_NAME: 'fa-rms-prod-uks-01'   
+      resource_group: 'rg-mhra-prod-uks-rms'
+      config_path: 'backend/api'
+    secrets:
+      AZURE_CREDENTIALS_RC: ${{ secrets.AZURE_CREDENTIALS_RC }}
+
+  Staging:
+    needs: [Apply-App-Settings]
+    uses: ./.github/workflows/node-app-deploy.yml
+    with:
+      environment: 'Prod'
+      FUNCTION_APP_NAME: 'fa-rms-prod-uks-01' 
+      resource_group: 'rg-mhra-prod-uks-rms'
+      slot_name_r2: 'staging'
+      src_path: 'backend/api/src'
+      app_name: 'rc-node-app-01'
+    secrets:
+      AZURE_CREDENTIALS_RC: ${{ secrets.AZURE_CREDENTIALS_RC }}
+      REPO_READ_PAT: ${{ secrets.REPO_READ_PAT }}
+
+  DAST-Staging:
+    needs: Staging
+    uses: ./.github/workflows/node-app-DAST.yml
+    with:
+      APP_URL: ${{ needs.Staging.outputs.appurl }}
+      environment: 'Staging'
+
+  Production:
+    needs: Staging
+    environment:
+      name: 'Prod'
+    runs-on: GP_PROD
+    steps:
+      - name: "Log in with Azure 🆔"
+        uses: azure/login@v2
+        with:
+          creds: '${{ secrets.AZURE_CREDENTIALS_RC }}'
+      - name: "Swap App Service Staging and Production Slots 🥏"
+        uses: azure/CLI@v1
+        with:
+          inlineScript: |
+            az webapp deployment slot swap --name ${{ vars.FUNCTION_APP_NAME }} --resource-group ${{ vars.AZURE_RESOURCE_GROUP }} --slot staging --target-slot production

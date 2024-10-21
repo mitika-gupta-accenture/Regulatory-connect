@@ -1,0 +1,114 @@
+name: Pa11y Automated Accessibility Testing
+on:
+  workflow_call:
+    inputs:
+      appurl:
+        required: false
+        type: string
+      src_path:
+        required: true
+        type: string
+      environment:
+        required: false
+        type: string
+      artifact_destination:
+        required: true
+        type: string
+      nexus_artifact_group_id:
+        required: false
+        type: string
+      nexus_artifact_id:
+        required: false
+        type: string
+jobs:
+  Pa11y:
+    runs-on: gp-prod-runner-set
+    env:
+      # nexus_artifact_repository: Regulatory-connect
+      nexus_artifact_repository: releases
+      nexus_server: https://devops-platform.mhra.gov.uk/nexus
+    steps:
+      - name: "Cleaning up Workspace"
+        working-directory: ${{ github.workspace }}
+        run: |
+          echo "Cleaning up previous run"
+          rm -rf *
+          ls -al '${{ github.workspace }}'
+
+      - name: "Checkout code ☁️"
+        uses: actions/checkout@v4
+
+      - name: "Update dynamic feature slot url"
+        working-directory: ${{ inputs.src_path }}
+        if: startsWith( github.head_ref, 'feature/' )
+
+        run: |
+          if [[ ${{ github.event_name }} = "push" ]]
+          then
+            slotname=$(echo $GITHUB_REF_NAME | cut -d '/' -f 2)
+          fi
+          if [[ ${{ github.event_name }} = "pull_request" ]]
+          then
+            slotname=$(echo $GITHUB_HEAD_REF | cut -d '/' -f 2)
+          fi
+          slotname=${slotname:5:19}-dev
+          if [[ ${slotname:0:1} = '-' ]]; then slotname=${slotname:1}; fi
+          slotname=$(echo $slotname | tr '[:upper:]' '[:lower:]' | sed 's/_/-/g')
+
+          echo "The slot name is $slotname"
+
+          tmp=$(mktemp)
+          sed 's|'"ase-rms-dev01-uks-02"'|'"ase-rms-dev01-uks-02-$slotname"'|g' .env.development > $tmp
+          cp $tmp .env.development
+          cat .env.development
+
+
+      - name: "Pa11y ⚡"
+        id: pa11y
+        working-directory: ${{ inputs.src_path }}/scripts/pa11y
+        run: |
+          # pa11y --runner axe ${{ inputs.appurl }} --standard WCAG2AAA --reporter html -l none > report.html
+          # npx pa11y-ci --config .pa11yci.json --reporter json
+          npm install env-cmd --save-dev --force
+          
+          if [[ ${{ inputs.environment }} = "UAT" ]]
+          then
+            node pa11y.js ../../.env.uat
+          elif [[ ${{ inputs.environment }} = "SIT" ]]
+          then
+            node pa11y.js ../../.env.sit
+          elif [[ ${{ inputs.environment }} = "PROD" ]]
+          then
+            node pa11y.js ../../.env.prod
+          else
+            node pa11y.js ../../.env.development
+          fi
+
+      - name: Publish to Nexus
+        if: ${{ inputs.artifact_destination == 'Nexus' }}
+        run: |
+          echo "---------------------------------------------------------"
+          echo "Nexus Artifact Name: ${{ inputs.nexus_artifact_id }}"
+          echo "Package Path: ${{ inputs.src_path }}/scripts/pa11y/results.json"
+          echo "Version: ${{ github.run_number }}"
+          echo "Artifact Repository: ${{ env.nexus_artifact_repository }}"
+          echo "Group Id: ${{ inputs.nexus_artifact_group_id }}"
+          echo "---------------------------------------------------------"
+          
+          mvn -D"file=${{ inputs.src_path }}/scripts/pa11y/results.json" \
+          -D"repositoryId=${{ env.nexus_artifact_repository }}" \
+          -D"groupId=${{ inputs.nexus_artifact_group_id }}.pa11y" \
+          -D"url=${{ env.nexus_server }}/repository/${{ env.nexus_artifact_repository }}" \
+          -D"packaging=json" \
+          -D"artifactId=${{ inputs.nexus_artifact_id }}" \
+          -D"version=${{ github.run_number }}" \
+          -D"repositoryLayout=default" \
+          deploy:deploy-file -B
+
+      - name: "Upload artifact"
+        if: always() && ${{ inputs.artifact_destination == 'Github' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: pally-report-rms
+          path: ${{ inputs.src_path }}/scripts/pa11y/results.json
+          retention-days: 14

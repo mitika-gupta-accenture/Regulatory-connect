@@ -1,0 +1,137 @@
+[
+    {
+      "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+      "value": "@Microsoft.KeyVault(SecretUri=https://kvrms02perfuks.vault.azure.net/secrets/APPINSIGHTS-INSTRUMENTATIONKEY/)",
+      "slotSetting": true
+    },
+    {
+      "name": "APPINSIGHTS_PROFILERFEATURE_VERSION",
+      "value": "1.0.0",
+      "slotSetting": true
+    },
+    {
+      "name": "APPINSIGHTS_SNAPSHOTFEATURE_VERSION",
+      "value": "1.0.0",
+      "slotSetting": true
+    },
+    {
+      "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
+      "value": "@Microsoft.KeyVault(SecretUri=https://kvrms02perfuks.vault.azure.net/secrets/APPLICATIONINSIGHTS-CONNECTION-STRING/)",
+      "slotSetting": false
+    },
+    {
+      "name": "ApplicationInsightsAgent_EXTENSION_VERSION",
+      "value": "~3",
+      "slotSetting": true
+    },
+    {
+      "name": "DiagnosticServices_EXTENSION_VERSION",
+      "value": "~3",
+      "slotSetting": true
+    },
+    {
+      "name": "ENABLE_ORYX_BUILD",
+      "value": "false",
+      "slotSetting": false
+    },
+    {
+      "name": "InstrumentationEngine_EXTENSION_VERSION",
+      "value": "disabled",
+      "slotSetting": true
+    },
+    {
+      "name": "NODE_ENV",
+      "value": "production",
+      "slotSetting": false
+    },
+    {
+      "name": "NODE_AUTH_TOKEN",
+      "value": "@Microsoft.KeyVault(SecretUri=https://kvrms02perfuks.vault.azure.net/secrets/NPM-REGISTRY-PAT/)",
+      "slotSetting": false
+    },
+    {
+      "name": "PORT",
+      "value": "3000",
+      "slotSetting": false
+    },
+    {
+      "name": "SCM_DO_BUILD_DURING_DEPLOYMENT",
+      "value": "false",
+      "slotSetting": false
+    },
+    {
+      "name": "SnapshotDebugger_EXTENSION_VERSION",
+      "value": "disabled",
+      "slotSetting": true
+    },
+    {
+      "name": "WEBSITE_HTTPLOGGING_RETENTION_DAYS",
+      "value": "2",
+      "slotSetting": false
+    },
+    {
+      "name": "WEBSITE_APPINSIGHTS_ENCRYPTEDAPIKEY",
+      "value": "@Microsoft.KeyVault(SecretUri=https://kvrms02perfuks.vault.azure.net/secrets/WEBSITE-APPINSIGHTS-ENCRYPTEDAPIKEY/)",
+      "slotSetting": false
+    },
+    {
+      "name": "WEBSITE_RUN_FROM_PACKAGE",
+      "value": "1",
+      "slotSetting": false
+    },
+    {
+      "name": "WEBSITE_WEBDEPLOY_USE_SCM",
+      "value": "false",
+      "slotSetting": false
+    },
+    {
+      "name": "XDT_MicrosoftApplicationInsights_BaseExtensions",
+      "value": "disabled",
+      "slotSetting": true
+    },
+    {
+      "name": "XDT_MicrosoftApplicationInsights_Mode",
+      "value": "recommended",
+      "slotSetting": true
+    },
+    {
+      "name": "XDT_MicrosoftApplicationInsights_PreemptSdk",
+      "value": "disabled",
+      "slotSetting": true
+    },
+    {
+      "name": "RC_R2_REDIS_CACHE_HOST",
+      "value": "rc-rms-perf-uks-01.redis.cache.windows.net",
+      "slotSetting": false
+    },
+    {
+      "name": "RC_R2_REDIS_CACHE_ACCESSKEY",
+      "value": "@Microsoft.KeyVault(SecretUri=https://kvrms02perfuks.vault.azure.net/secrets/REDIS-CACHE-ACCESSKEY/)",
+      "slotSetting": false
+    },
+    {
+      "name": "NEXT_PUBLIC_API_BASE_URL",
+      "value": "https://regulatoryconnect-perf.mhra.gov.uk/api/",
+      "slotSetting": false
+    },
+    {
+      "name": "BUILD_ANALYZE",
+      "value": "true",
+      "slotSetting": false
+    },
+    {
+      "name": "KEY_VAULT_NAME",
+      "value": "kvrms02perfuks",
+      "slotSetting": false
+    },
+    {
+      "name": "SESSION_TTL",
+      "value": "10",
+      "slotSetting": false
+    },
+    {
+      "name": "PROTOCOL",
+      "value": "https",
+      "slotSetting": false
+    }
+  ]

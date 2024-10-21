@@ -1,0 +1,110 @@
+[
+  {
+    "sectionName": "Reason for reporting",
+    "identifier": "suspect-seller",
+    "question": "Why do you want to report this website?",
+    "fields": [
+      {
+        "type": "paragraph",
+        "content": ["Why are you reporting the website or online marketplace."]
+      },
+      {
+        "identifier": "why-are-you-reporting-radios",
+        "type": "radio",
+        "validations": [
+          {
+            "required": "Choose why you want to report this website"
+          }
+        ],
+        "answers": [
+          {
+            "value": "I suspect the seller is offering illegal medicines or medical devices",
+            "route": "why-do-you-suspect-seller"
+          },
+          {
+            "value": "Something else",
+            "route": "seller-name"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "sectionName": "Reason for reporting",
+    "identifier": "why-do-you-suspect-seller",
+    "question": "Why do you suspect that the website sells illegal medicines?",
+    "fields": [
+      {
+        "type": "paragraph",
+        "content": ["Why are you reporting the website or online marketplace."]
+      },
+      {
+        "identifier": "why-do-you-suspect-radios",
+        "type": "radio",
+        "validations": [
+          {
+            "required": "Choose why you suspect that the website sells illegal medicines"
+          }
+        ],
+        "answers": [
+          {
+            "value": "I was asked to pay with Cryptocurrency",
+            "route": "seller-name"
+          },
+          {
+            "value": "I can only contact the seller by text or instant message",
+            "route": "seller-name"
+          },
+          {
+            "value": "Something else",
+            "route": "seller-name",
+            "fields": [
+              {
+                "identifier": "why-user-suspects-the-website",
+                "type": "text",
+                "validations": [
+                  {
+                    "required": "Please enter the reason you suspect the website"
+                  }
+                ],
+                "label": "Explain why you suspect the website",
+                "errorMessage": "Please enter the reason you suspect the website",
+                "size": 20
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "sectionName": "Reason for reporting",
+    "identifier": "medication-and-adverse-reactions",
+    "question": "About the medicine or device and adverse ractions",
+    "fields": [
+      {
+        "type": "paragraph",
+        "content": [
+          "Tell us about the medicine or product you bought and the adverse ractions you've experienced since taking it."
+        ]
+      },
+      {
+        "identifier": "medication",
+        "type": "text",
+        "label": "Medication (optional)",
+        "exampleAnswer": "For example, 'Ozempic'",
+        "errorMessage": "Fill in the text box",
+        "size": 20
+      },
+      {
+        "identifier": "adverse-reacitons",
+        "type": "text",
+        "label": "Adverse Reactions (optional)",
+        "exampleAnswer": "For example, 'headaches' or 'Feeling or being sick",
+        "errorMessage": "Fill in the text box",
+        "size": 20
+      }
+    ],
+    "route": "seller-details"
+  }
+]

@@ -1,0 +1,43 @@
+[
+  {
+    "sectionName": "Onboard an organisation",
+    "identifier": "organisation-billing-details",
+    "question": "What is your organisation's VAT number and classification",
+    "route": "organisation-billing-address",
+    "fields": [
+      {
+        "type": "paragraph",
+        "content": [
+          "If your organisation is based in the United Kingdom, you will need to provide:",
+          " - your organisation's VAT registration number if it is registered for VAT\n - your organisation's sector classification"
+        ]
+      },
+      {
+        "identifier": "organisation-VAT-registration-number",
+        "type": "text",
+        "label": "Enter your organisation's VAT registration number (if applicable)",
+        "hint": "Your VAT number is a unique combination of 9 numbers, sometimes with a prefix of GB - for example, GB123456789.",
+        "size": 30
+      },
+      {
+        "identifier": "organisation-sector-classification",
+        "type": "text",
+        "label": "Enter your organisation's sector classification",
+        "hint": "You can enter the sector name or Standard Industrial Classification (SIC) code.",
+        "validations": [
+          {
+            "required": "You must enter your organsation's sector name or SIC code"
+          }
+        ],
+        "errorMessage": "You must enter your organsation's sector name or SIC code",
+        "size": 30
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          "Select Continue to add your organisation's billing details."
+        ]
+      }
+    ]
+  }
+]

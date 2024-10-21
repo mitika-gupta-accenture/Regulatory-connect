@@ -1,0 +1,19 @@
+[
+  {
+    "sectionName": "Onboard organisation",
+    "identifier": "confirm-organisation-details",
+    "fields": [
+      {
+        "type": "heading",
+        "text": "Confirm your organisation's details",
+        "identifier": "confirm-organisation-heading"
+      },
+      {
+        "type": "server-component",
+        "rule": "confirm-organisation",
+        "identifier": "confirm-organisation"
+      }
+    ],
+    "route": "/todo"
+  }
+]

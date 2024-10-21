@@ -1,0 +1,82 @@
+[
+  {
+    "sectionName": "Onboard an organisation",
+    "identifier": "organisation-head-office-address",
+    "question": "Enter your organisation's head office address",
+    "isCancelButtonRequired": false,
+    "route": "organisation-classification",
+    "fields": [
+      {
+        "identifier": "organisation-address-text-1",
+        "type": "text",
+        "label": "Address line 1",
+        "validations": [
+          {
+            "required": "You must enter address line 1"
+          }
+        ],
+        "errorMessage": "You must enter address line 1",
+        "size": 40
+      },
+      {
+        "identifier": "organisation-address-text-2",
+        "type": "text",
+        "label": "Address line 2 (optional)",
+        "size": 40
+      },
+      {
+        "identifier": "organisation-address-text-3",
+        "type": "text",
+        "label": "Address line 3 (optional)",
+        "size": 40
+      },
+      {
+        "identifier": "organisation-address-text-4",
+        "type": "text",
+        "label": "Address line 4 (optional)",
+        "size": 40
+      },
+      {
+        "identifier": "organisation-address-town-or-city",
+        "type": "text",
+        "label": "Town or city",
+        "validations": [
+          {
+            "required": "You must enter the town or city"
+          }
+        ],
+        "errorMessage": "You must enter the town or city",
+        "size": 20
+      },
+      {
+        "identifier": "organisation-address-county-state-or-province",
+        "type": "text",
+        "label": "County, state or province (optional)",
+        "size": 20
+      },
+      {
+        "identifier": "organisation-address-postcode-or-zip",
+        "type": "text",
+        "label": "Postcode or zip code",
+        "validations": [
+          {
+            "required": "You must enter the postcode or zip code"
+          }
+        ],
+        "errorMessage": "You must enter the postcode or zip code",
+        "size": 20
+      },
+      {
+        "identifier": "organisation-country",
+        "type": "server-component",
+        "label": "Country",
+        "rule": "getOrganisationCountry",
+        "validations": [
+          {
+            "required": "You must select a country"
+          }
+        ]
+      }
+    ]
+  }
+]

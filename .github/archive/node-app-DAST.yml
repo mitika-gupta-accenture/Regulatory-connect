@@ -1,0 +1,41 @@
+name: DAST-Scan
+
+on:
+  workflow_call:
+    inputs:
+      APP_URL:
+        required: true
+        type: string
+      environment:
+        required: true
+        type: string
+    outputs:
+      jobstatus: 
+        description: "Job status"
+        value: ${{ jobs.OWASP-DAST-Scan.outputs.jobstatus}}
+jobs:
+  OWASP-DAST-Scan:
+    environment:
+      name: ${{ inputs.environment }}
+    outputs:
+      jobstatus: ${{ job.status }}  
+    runs-on: DOCKER_PROD
+    steps:
+      - name: "OWASP ZAP Baseline Scan"
+        id: owaspzap
+        run: |
+          mkdir -p zap
+          docker run -v ./zap:/zap/wrk/:rw --name zap_node --network=host -e ZAP_AUTH_HEADER -e ZAP_AUTH_HEADER_VALUE -e ZAP_AUTH_HEADER_SITE -u 0 -t ghcr.io/zaproxy/zaproxy:stable zap-baseline.py -t ${{ inputs.APP_URL }} -d -r report_html.html || true
+          docker cp zap_node:/zap/wrk/report_html.html ./zap/report_html.html
+      
+      - name: "Upload HTML report"
+        if: steps.owaspzap.outcome == 'success'
+        uses: actions/upload-artifact@v4.3.1
+        with:
+          name: owasp-zap-report-${{ inputs.environment }}
+          path: ./zap/report_html.html
+          retention-days: 7
+
+      - name: "Delete zap scan's container"
+        if: always()
+        run: docker rm zap_node

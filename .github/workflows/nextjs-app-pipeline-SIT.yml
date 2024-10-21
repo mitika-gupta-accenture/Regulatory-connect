@@ -1,0 +1,91 @@
+name: NextJs Pipeline for SIT deployment
+on:
+  push:
+    branches:
+       - "sit"
+    paths:
+      - "frontend/**"
+      - ".github/workflows/next**"
+      - "env/sit_config.json"
+
+jobs:
+  Read-Approval:
+    runs-on: gp-prod-runner-set
+    environment: Approval-Gate
+    steps:
+      - name: "Approval Status"
+        run: |
+          echo "Approval Completed" 
+
+  Build:
+    needs: Read-Approval
+    uses: ./.github/workflows/nextjs-app-ci.yml
+    with:
+      NODE_VERSION: '20.x'
+      artifact_destination: 'Github'
+      environment: 'SIT'
+      app_name: 'rc-nextjs-app'
+      src_path: frontend
+      config_path: 'env'
+      nexus_artifact_group_id: rc-nextjs-sit
+      nexus_artifact_id: frontend
+    secrets:
+      NPM_REGISTRY_PAT: ${{ secrets.NPM_REGISTRY_PAT }}
+      AZURE_CREDENTIALS_RC: ${{ secrets.AZURE_CREDENTIALS_RC }}
+
+  SonarQube:
+    needs: Build
+    uses: ./.github/workflows/nextjs-app-sonarqube-scan.yml
+    with:
+      app_name: 'rc-nextjs-app'
+      artifact_destination: 'Github'
+      nexus_artifact_group_id: rc-nextjs-sit
+      nexus_artifact_id: frontend
+    secrets:
+      SonarAccessToken: ${{ secrets.SONAR_TOKEN }}
+
+  OWASP-Scan:
+    needs: Build
+    uses: ./.github/workflows/nextjs-app-owasp-scan.yml
+    with:
+      app_name: 'rc-nextjs-app'
+      artifact_destination: 'Github'
+      nexus_artifact_group_id: rc-nextjs-sit
+      nexus_artifact_id: frontend
+
+  SIT:
+    needs: SonarQube
+    uses: ./.github/workflows/nextjs-app-deploy-app-service.yml
+    with: 
+      environment: 'SIT'
+      AZURE_WEBAPP_NAME: 'ase-rms-sit-uks-02' 
+      resource_group: 'rg-mhra-sit-uks-rms'
+      src_path: 'frontend/src'
+      app_name: 'rc-nextjs-app'
+      config_path: 'env'
+      artifact_destination: 'Github'
+      nexus_artifact_group_id: rc-nextjs-sit
+      nexus_artifact_id: frontend
+    secrets:
+      AZURE_CREDENTIALS_RC: ${{ secrets.AZURE_CREDENTIALS_RC}}
+      REPO_READ_PAT: ${{ secrets.REPO_READ_PAT }}
+
+  DAST-SIT:
+    needs: SIT
+    uses: ./.github/workflows/nextjs-app-DAST.yml
+    with:
+      APP_URL: ${{ needs.SIT.outputs.appurl }}
+      environment: 'SIT'
+      artifact_destination: 'Github'
+      nexus_artifact_group_id: rc-nextjs
+      nexus_artifact_id: frontend
+
+  # Test-Accessibility-SIT:
+  #   needs: SIT
+  #   uses: ./.github/workflows/nextjs-app-run-pa11y.yml
+  #   with:
+  #     environment: 'SIT'
+  #     src_path: frontend
+  #     artifact_destination: 'Github'
+  #     nexus_artifact_group_id: rc-nextjs-sit
+  #     nexus_artifact_id: frontend

@@ -1,0 +1,54 @@
+[
+    {
+        "sectionName": "Generate a dossier ID",
+        "identifier": "which-type-of-dossier-id-do-you-want-to-generate",
+        "question": "Which type of dossier ID do you want to generate?",
+        "apiGroupName": "GET_PL_DOSSIER_ID",
+        "isCancelButtonRequired": false,
+        "buttonText": "Generate",
+        "fields": [
+            {
+                "identifier": "caption-type",
+                "type": "govuk-caption",
+                "size": "l",
+                "apiDataKey": "microsoftUserDetails.selectedOrganisation.name",
+                "text": "###{}"
+            },
+            {
+                "identifier": "generate-dossier-content",
+                "type": "paragraph",
+                "content": [
+                    "This page enables you to create a unique MHRA dossier ID for your electronic Common Technical Document (eCTD) file.",
+                    "You will need your MHRA dossier ID when uploading eCTD files for product licence (PL) applications, variations and Master File submissions.",
+                    "When making either bulk submissions or changes to multiple products, ensure that the correct dossier ID is linked to the correct PL number.",
+                    "The MHRA dossier ID must be included on all MHRA application forms and submissions. Additionally, the International Council for Harmonisation of Technical Requirements for Pharmaceuticals for Human Use (ICH) format's universally unique identifier (UUID) should be used in the eCTD file index (backbone) at all times."
+                ]
+            },
+             {
+                "type": "radio",
+                "identifier": "dossierTypeIdentifier",
+                "validations": [
+                    {
+                        "required": "You must select which type of dossier ID you want to generate"
+                    }
+                ],
+                "apiDataKey": "dossierType"
+            }
+        ],
+        "route": "generation-successful"
+    },
+    {
+        "identifier": "generation-successful",
+        "question": "",
+        "showSubmitButton": false,
+        "isCancelButtonRequired": false,
+        "fields": [
+            {
+                "type": "server-component",
+                "rule": "generationSuccessful",
+                "identifier": "generation-successful",
+                "useFor": "POST_PL_GENERATE_DOSSIER_ID"
+            }
+        ]
+    }
+]

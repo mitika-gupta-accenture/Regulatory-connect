@@ -1,0 +1,46 @@
+{
+  "answersArr": {
+    "answers": [
+      {
+        "type": "answer",
+        "question": "Does your application relate to:",
+        "answer": "Homeopathic- National Rules Scheme",
+        "number": 0
+      },
+      {
+        "type": "answer",
+        "question": "Does your application relate to the introduction of a new indication for a therapeutic use not previously covered by the authorisation?",
+        "answer": "No",
+        "number": 9
+      },
+      {
+        "type": "answer",
+        "question": "Does any of the following apply to your application(s)?",
+        "answer": "No",
+        "number": 9
+      },
+      {
+        "type": "answer",
+        "question": "How many applications are you making? (please entre 1 for a single application)",
+        "answer": 35,
+        "number": 11
+      }
+    ],
+    "keyPoints": [
+      {
+        "type": "key point",
+        "question": "Does any of the following apply to your application(s)?",
+        "identifier": "feeType",
+        "answer": "NR Other",
+        "number": 9
+      },
+      {
+        "type": "key point",
+        "question": "How many applications are you making? (please entre 1 for a single application)",
+        "identifier": "additionalStrengths",
+        "answer": 35,
+        "number": 11
+      }
+    ]
+  }
+}

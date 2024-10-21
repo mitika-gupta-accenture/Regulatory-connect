@@ -1,0 +1,178 @@
+[
+  {
+    "sectionName": "Supporting evidence",
+    "identifier": "evidence-of-seller",
+    "question": "Can you take a screenshot of the website?",
+    "fields": [
+      {
+        "type": "details",
+        "heading": "Help me take a screenshot from my computer",
+        "fields": [
+          {
+            "type": "tabs",
+            "tabs": [
+              {
+                "heading": "Mac",
+                "content": [
+                  "Try this:",
+                  "<ul>",
+                  "<li>Press the <b>Shift</b> key (⇧), <b>command</b> (or Cmd), and 3</li>",
+                  "<li>The screenshot will be saved to your <b>Desktop</b></li>",
+                  "<li>You can now upload it to this report form</li>",
+                  "</ul>",
+                  "<a href='https://support.apple.com/en-us/102646'>Get more help from Apple</a>"
+                ]
+              },
+              {
+                "heading": "Chromebook",
+                "content": [
+                  "Try this:",
+                  "<ul>",
+                  "<li>Press the <b>Ctrl</b> key and the <b>switch window</b> key</li>",
+                  "<li>The screenshot will be saved to your <b>downloads</b></li>",
+                  "<li>You can now upload it to this form</li>",
+                  "</ul>",
+                  "If that doesn't work, try pressing <b>Ctrl</b> and <b>F5</b>",
+                  "<a href='https://www.androidcentral.com/how-take-screenshot-chromebook'>Get more help from Android Central</a>"
+                ]
+              },
+              {
+                "heading": "All other computers",
+                "content": [
+                  "Try this:",
+                  "<ul>",
+                  "<li>Press the <b>Prt Scr</b> key (or similar) to take a copy of your screen</li>",
+                  "<li>Paste the image into Microsoft Paint or a similar application</li>",
+                  "<li>Save the file to your computer</li>",
+                  "<li>Upload the file to the form</li>",
+                  "</ul>",
+                  "If that doesn't work, you may need to search for how to take screenshots on your particular computer model."
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "identifier": "evidence-of-seller-radios",
+        "type": "radio",
+        "validations": [
+          {
+            "required": "Confirm if you can take a photo of the seller's website"
+          }
+        ],
+        "answers": [
+          {
+            "value": "Yes",
+            "route": "more-evidence",
+            "fields": [
+              {
+                "question-identifier": "evidence-of-seller",
+                "identifier": "upload-screenshots",
+                "type": "file",
+                "label": "Choose up to 2 photos or images to upload",
+                "validations": [
+                  {
+                    "required": "Please select a file to upload",
+                    "too-big": "Please select a file smaller than 5 MB",
+                    "invalid-type": "Please select a file with .DOC, .DOCX, PDF, TIF, JPG or PNG format"
+                  }
+                ],
+                "exampleAnswer": "The file must be a .DOC, .DOCX, PDF, TIF, JPG or PNG and be smaller than ",
+                "size": 5,
+                "maxFileUploads": 2
+              }
+            ]
+          },
+          {
+            "value": "No",
+            "route": "more-evidence"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "sectionName": "Supporting evidence",
+    "identifier": "more-evidence",
+    "question": "Can you take a photograph of the medicine or the packaging it came in?",
+    "fields": [
+      {
+        "identifier": "more-evidence-radios",
+        "type": "radio",
+        "validations": [
+          {
+            "required": "Confirm if you can take a photo of the medicine or the packaging"
+          }
+        ],
+        "answers": [
+          {
+            "value": "Yes",
+            "route": "additional-information",
+            "fields": [
+              {
+                "question-identifier": "more-evidence",
+                "identifier": "upload-screenshots",
+                "type": "file",
+                "label": "Choose up to 5 photos or images to upload",
+                "validations": [
+                  {
+                    "required": "Please select a file to upload",
+                    "too-big": "Please select a file smaller than 5 MB",
+                    "invalid-type": "Please select a file with .DOC, .DOCX, PDF, TIF, JPG or PNG format"
+                  }
+                ],
+                "exampleAnswer": "The file must be a .DOC, .DOCX, PDF, TIF, JPG or PNG and be smaller than ",
+                "size": 5,
+                "maxFileUploads": 5
+              }
+            ]
+          },
+          {
+            "value": "No",
+            "route": [
+              {
+                "evidence-of-email": {
+                  "equals": {
+                    "select-other-evidence": "Email from the seller"
+                  }
+                }
+              },
+              {
+                "evidence-of-text-message": {
+                  "equals": {
+                    "select-other-evidence": "Text message from the seller"
+                  }
+                }
+              },
+              {
+                "evidence-of-payment": {
+                  "equals": {
+                    "select-other-evidence": "Payment confirmation"
+                  }
+                }
+              },
+              {
+                "evidence-of-seller-bank-details": {
+                  "equals": {
+                    "select-other-evidence": "Seller's bank details"
+                  }
+                }
+              },
+              {
+                "evidence-of-other-info": {
+                  "equals": {
+                    "select-other-evidence": "Something else"
+                  }
+                }
+              },
+              {
+                "additional-information": "default"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

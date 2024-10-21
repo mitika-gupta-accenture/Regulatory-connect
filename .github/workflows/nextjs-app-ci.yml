@@ -1,0 +1,181 @@
+name: CI
+
+on:
+  workflow_call:
+    inputs:
+      NODE_VERSION:
+        required: true
+        type: string
+      artifact_destination:
+        required: true
+        type: string
+      environment:
+        required: true
+        type: string
+      app_name:
+        default: rc-nextjs-app
+        required: false
+        type: string
+      src_path:
+        required: true
+        type: string
+      config_path:
+        required: true
+        type: string
+      nexus_artifact_group_id:
+        required: false
+        type: string
+      nexus_artifact_id:
+        required: false
+        type: string
+    secrets:
+      NPM_REGISTRY_PAT:
+        required: true
+      AZURE_CREDENTIALS_RC:
+        required: true
+
+jobs:
+  Build:
+    runs-on: gp-prod-runner-set
+    environment:
+      name: ${{ inputs.environment }}
+    env:
+      # nexus_artifact_repository: Regulatory-connect
+      nexus_artifact_repository: releases
+      nexus_server: https://devops-platform.mhra.gov.uk/nexus
+    steps:
+      - name: "Cleaning up Workspace"
+        working-directory: ${{ github.workspace }}
+        run: |
+          echo "Cleaning up previous run"
+          rm -rf *
+          ls -al '${{ github.workspace }}'
+
+      - name: "Checkout code ☁️"
+        uses: actions/checkout@v4
+        
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.NODE_VERSION }}
+          #cache: 'yarn'
+          cache-dependency-path: .
+          
+          
+      # - name: "Cache dependencies"
+      #   id: check-cache
+      #   uses: actions/cache@v4
+      #   with:
+      #     path: ${{ inputs.src_path }}/node_modules
+      #     key: ${{ github.workspace }}-${{ hashFiles('frontend/package.json') }}
+        
+      # - name: "Install node dependencies"
+      #   if: steps.check-cache.outputs.cache-hit != 'true'
+      #   working-directory: ${{ inputs.src_path }}
+      #   run: yarn install --frozen-lockfile
+
+      # - name: "Create local-storage directory at root of applicaton code"
+      #   working-directory: ${{ github.workspace }}/${{ inputs.src_path }}
+      #   run: |
+      #     mkdir local-storage
+      #     chmod 777 local-storage
+      #     ls -alrt
+
+      # - name: "Log in with Azure 🆔"
+      #   uses: azure/login@v2
+      #   with:
+      #     creds: "${{ secrets.AZURE_CREDENTIALS_RC }}"
+
+      # - name: "Generate .env file"
+      #   run: |
+      #     cd ${{ github.workspace }}/${{ inputs.config_path }}
+      #     env_name=$(echo ${{ inputs.environment }} | tr '[:upper:]' '[:lower:]')
+      #     echo "AppSettings Config File: ${env_name}_config.json"
+
+      #     app_settings=$(jq -r '.[] | "\(.name)|\(.value)"' ${env_name}_config.json)
+      #     echo "Setting environment variables for appsetting values"
+      #     while IFS=$'|' read -r name value
+      #     do
+      #       if [[ $value == *@Microsoft.KeyVault* ]]
+      #       then
+      #         kv_name=$(echo $value | cut -d '/' -f3 | cut -d '.' -f1)
+      #         kv_secret_name=$(echo $value | cut -d '/' -f5)
+      #         value=test-kv-value
+      #       fi
+
+      #       export "$name=$value"
+      #     done <<< "$app_settings"
+
+      #     cd ${{ github.workspace }}/${{ inputs.src_path }}
+      #     echo "Updating placeholders in env file for actual values from appsettings"
+      #     while IFS= read -r item || [ -n "$item" ]; do
+      #       echo $item | envsubst
+      #     done < <(cat .env) > .env.tmp
+
+      - name: "Install node dependencies"
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_REGISTRY_PAT }}
+        working-directory: ${{ inputs.src_path }}
+        run: npm install
+
+      - name: "Build Nextjs application"
+        working-directory: ${{ inputs.src_path }}
+        run: |
+          while IFS= read -r line || [ -n "$line" ]; do
+            export "$line=$line"
+          done < "all_next_public_build_env_vars.txt"
+
+          # echo "Building App for ${{ inputs.environment }}"
+          # cp .env.tmp .env
+
+          # echo "Deleting the temp env file"
+          # rm -rf .env.tmp
+          
+          npx next build
+
+      # - name: "Run unit tests 🧪"
+      #   working-directory: ${{ inputs.src_path }}
+      #   run: |
+      #     echo "Placeholder for running jest unit tests"
+      #     npx run test
+
+      - name: "Copy the static & public content to .next directory"
+        working-directory: ${{ inputs.src_path }}
+        run: |
+          cp -r ./public ./.next/standalone/public
+          ls -lsa ./.next/standalone/.next
+          mkdir ./.next/standalone/.next/static
+          cp -r ./.next/static/* ./.next/standalone/.next/static/
+
+      - name: "Zip directory for subsequent stages"
+        working-directory: ${{ inputs.src_path }}
+        run: zip --symlinks -r ${{ inputs.app_name }}.zip .
+
+      - name: Publish to Nexus
+        if: ${{ inputs.artifact_destination == 'Nexus' }}
+        run: |
+          echo "---------------------------------------------------------"
+          echo "Nexus Artifact Name: ${{ inputs.nexus_artifact_id }}"
+          echo "Package Path: ${{ inputs.src_path }}/${{ inputs.app_name }}.zip"
+          echo "Version: ${{ github.run_number }}"
+          echo "Artifact Repository: ${{ env.nexus_artifact_repository }}"
+          echo "Group Id: ${{ inputs.nexus_artifact_group_id }}"
+          echo "---------------------------------------------------------"
+          
+          mvn -D"file=${{ inputs.src_path }}/${{ inputs.app_name }}.zip" \
+          -D"repositoryId=${{ env.nexus_artifact_repository }}" \
+          -D"groupId=${{ inputs.nexus_artifact_group_id }}" \
+          -D"url=${{ env.nexus_server }}/repository/${{ env.nexus_artifact_repository }}" \
+          -D"packaging=zip" \
+          -D"artifactId=${{ inputs.nexus_artifact_id }}" \
+          -D"version=${{ github.run_number }}" \
+          -D"repositoryLayout=default" \
+          deploy:deploy-file -B
+          
+      - name: "Upload artifact"
+        uses: actions/upload-artifact@v4
+        if: ${{ inputs.artifact_destination == 'Github' }}
+        with:
+          name: ${{ inputs.app_name }}
+          path: ${{ inputs.src_path }}/${{ inputs.app_name }}.zip
+          retention-days: 1

@@ -1,0 +1,69 @@
+name: Function App configuration
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+      CONFIG_TYPE:
+        required: true
+        type: string   
+      FUNCTION_APP_NAME:
+        required: true
+        type: string
+      resource_group:
+        required: true
+        type: string
+      config_path:
+        required: true
+        type: string
+    secrets:
+      AZURE_CREDENTIALS_RC:
+        required: false 
+
+jobs:
+  Config-Update:
+    runs-on: GP_PROD
+    environment:
+      name: ${{ inputs.environment }}
+    steps:
+      - name: "Cleaning up Workspace"
+        working-directory: ${{ github.workspace }}
+        run: |
+          echo "Cleaning up previous run"
+          rm -rf *
+          ls -al '${{ github.workspace }}'
+
+      - name: "Log in with Azure 🆔"
+        uses: azure/login@v2
+        with:
+          creds: "${{ secrets.AZURE_CREDENTIALS_RC }}"
+
+      - name: "Checkout Code ☁️"
+        uses: actions/checkout@v4
+
+      - name: Apply Function App configuration 
+        working-directory: ${{ inputs.config_path }} 
+        run: |
+          if [[ "${{ inputs.environment }}" == "Prod" ]]
+          then
+            app_settings=$(az functionapp config appsettings list -g ${{ inputs.resource_group }} -n ${{ inputs.FUNCTION_APP_NAME }} --query "[?name=='WEBSITE_CONTENTSHARE'].value" -o tsv)
+            
+            # Check if the app settings variable is not empty
+            if [ -n "$app_settings" ]; then
+                echo "WEBSITE_CONTENTSHARE value: $app_settings"
+            
+                # Update the value in prod_config.json
+
+                jq  --arg newvalue "$app_settings" 'map(if .name == "WEBSITE_CONTENTSHARE" then .value = $newvalue else . end)' ${{ inputs.CONFIG_TYPE }}_config.json > tmp-appsettings.json && mv tmp-appsettings.json "${{ inputs.CONFIG_TYPE }}_config.json"
+
+                echo "Updated prod_config.json with WEBSITE_CONTENTSHARE value: $app_settings"
+            else
+                echo "Error: Unable to retrieve WEBSITE_CONTENTSHARE value."
+            fi
+
+            cat  ${{ inputs.CONFIG_TYPE }}_config.json
+          fi
+
+          az functionapp config appsettings set -g ${{ inputs.resource_group }} -n ${{ inputs.FUNCTION_APP_NAME }} --settings @"${{ inputs.CONFIG_TYPE }}_config.json"
+

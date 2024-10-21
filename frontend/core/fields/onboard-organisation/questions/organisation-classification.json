@@ -1,0 +1,21 @@
+[
+  {
+    "sectionName": "Onboard your organisation",
+    "identifier": "organisation-classification",
+    "question": "Enter your organisation's classification",
+    "isCancelButtonRequired": false,
+    "fields": [
+      {
+        "identifier": "organisation-classification",
+        "type": "server-component",
+        "rule": "getOrganisationClassification",
+        "validations": [
+          {
+            "required": "You must select a classification"
+          }
+        ]
+      }
+    ],
+    "route": "organisation-previous-names"
+  }
+]

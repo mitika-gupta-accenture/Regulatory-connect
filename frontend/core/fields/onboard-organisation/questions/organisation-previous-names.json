@@ -1,0 +1,30 @@
+[
+  {
+    "sectionName": "Onboard an organisation",
+    "identifier": "organisation-previous-names",
+    "question": "Organisation's previous names",
+    "fields": [
+      {
+        "type": "paragraph",
+        "content": [
+          "Organisations may change their name over time. If your organisation has traded under or was previously known by a different name, provide those details below.",
+          "If your organisation has not traded under or been previously known by a different name, skip this question."
+        ],
+        "identifier": "organisation-previous-names-description"
+      },
+      {
+        "type": "server-component",
+        "rule": "org-previous-names",
+        "identifier": "organisation-previous-names"
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          "Select Continue to skip this question and go to add contact details."
+        ],
+        "identifier": "organisation-previous-names-continue-text"
+      }
+    ],
+    "route": "organisation-authorised-to-communicate"
+  }
+]

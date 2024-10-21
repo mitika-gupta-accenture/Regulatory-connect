@@ -1,0 +1,26 @@
+[
+  {
+    "sectionName": "Onboard an organisation",
+    "identifier": "organisation-authorised-to-communicate",
+    "question": "Who is authorised to communicate about your organisation?",
+    "route": "organisation-billing-details",
+    "fields": [
+      {
+        "identifier": "organisation-contacts",
+        "type": "server-component",
+        "rule": "add-contacts",
+        "validations": [
+          {
+            "required": "Add at least one contact"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          "Select Continue to add your organisation's VAT number and sector classification."
+        ]
+      }
+    ]
+  }
+]

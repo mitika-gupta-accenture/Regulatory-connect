@@ -1,0 +1,61 @@
+name: SonarQube-Scan
+
+on:
+  workflow_call:
+    secrets:
+      SonarAccessToken:
+        required: true
+    inputs:
+      src_path:
+        required: true
+        type: string
+      app_name:
+        required: true
+        type: string
+
+jobs:
+  SonarQube-SAST:
+    runs-on: GP_PROD
+    steps:
+      - name: "Cleaning up Workspace"
+        working-directory: ${{ github.workspace }}
+        run: |
+          echo "Cleaning up previous run"
+          pwd
+          ls -al '${{ github.workspace }}'
+          rm -rf *
+          ls -al '${{ github.workspace }}'
+
+      - name: "Download artifact for Sonarqube Scan"
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.app_name }}
+
+      - name: "Unzip"
+        run: unzip -q -o ${{ inputs.app_name }}.zip
+
+      - name: "Run code through SonarQube"
+        run: |
+          # Providing sonarproject value as per the branch
+          if [[ (${{ github.ref }} == 'refs/heads/main') || (${{ github.ref }} == 'refs/heads/develop') ]]
+          then 
+            sonarproject="${{ inputs.app_name }}_${{ github.ref_name }}"
+          elif [[ ${{ github.ref }} == refs/heads/release* ]]
+          then
+            sonarproject="${{ inputs.app_name }}_Release"
+          else
+            sonarproject="${{ inputs.app_name }}_featurebranch"
+          fi
+
+          # Running SonarQube
+          /opt/sonar-scanner/bin/sonar-scanner -Dsonar.login=${{ secrets.SonarAccessToken }} \
+          -DskipTests=true -Dsonar.host.url="https://devops-platform.mhra.gov.uk/sonarqube" \
+          -Dsonar.projectKey="$sonarproject" -Dsonar.buildbreaker.queryMaxAttempts=50 \
+          -Dsonar.buildbreaker.queryInterval=50000 \
+          -DJVMOptions="-Xms1024m -Xmx3072m" \
+          -Dsonar.javascript.lcov.reportPaths="${{ github.workspace }}/${{ inputs.src_path }}/coverage/lcov.info" \
+          -Dsonar.sources=${{ github.workspace }}/${{ inputs.src_path }} \
+          -Dsonar.exclusions=${{ inputs.src_path }}/coverage/lcov-report/**,${{ inputs.src_path }}/test/**,${{ inputs.src_path }}/MoveFile/**,${{ inputs.src_path }}/node_modules/**,${{ inputs.src_path }}/UnzipFile/** \
+          -Dsonar.qualitygate.wait=true \
+          -Dsonar.qualitygate.timeout=600 \
+          -Dsonar.scanner.responseTimeout=120

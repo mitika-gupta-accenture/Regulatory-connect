@@ -1,0 +1,22 @@
+[
+  {
+    "sectionName": "Onboard an organisation",
+    "identifier": "organisation-upload-files-mandatory",
+    "question": "Upload your [Mandatory file name]",
+    "route": "check-and-confirm-answers",
+    "fields": [
+      {
+        "type": "paragraph",
+        "content": ["<strong>Uploaded file<strong>"]
+      },
+      {
+        "type": "paragraph",
+        "content": ["wait until the file has uploaded before continuing."]
+      },
+      {
+        "type": "paragraph",
+        "content": ["<strong>Optional documents<strong>"]
+      }
+    ]
+  }
+]

@@ -1,0 +1,55 @@
+name: OWASP-Scan
+
+on:
+  workflow_call:
+    inputs:
+      src_path:
+        required: true
+        type: string
+      app_name:
+        required: true
+        type: string
+    
+jobs:
+  OWASP-Scan:
+    runs-on: GP_PROD
+    steps:
+      - name: "Cleaning up Workspace"
+        working-directory: ${{ github.workspace }}
+        run: |
+          echo "Cleaning up previous run"
+          rm -rf *
+          ls -al '${{ github.workspace }}'
+
+      - name: "Download artifact for OWASP Scan"
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.app_name }}
+
+      - name: "Unzip"
+        run: unzip -q -o ${{ inputs.app_name }}.zip
+
+      - name: 'Run OWASP dependency checks'
+        run: |
+          
+          cd ${{ github.workspace }}
+
+          mvn -D"transitive=false" \
+          -D"artifactId=dependency-check" \
+          -D"packaging=zip" \
+          -D"dest=dependency-check-8.0.2.zip" \
+          -D"groupId=com.devops.owasp" \
+          -D"remoteRepositories=thirdparty::default::https://devops-platform.mhra.gov.uk/nexus" \
+          -D"version=8.0.2" \
+          org.apache.maven.plugins:maven-dependency-plugin:2.8:get \
+          -B
+          unzip -q -o dependency-check-8.0.2.zip
+
+          ./dependency-check/bin/dependency-check.sh --project "${{ inputs.app_name }}" --scan ${{ github.workspace }}/${{ inputs.src_path }}/package.json --out ${{ github.workspace }}
+
+      - name: "Upload OWASP result"
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-check-report
+          path: ${{ github.workspace }}/dependency-check-report.html
+          retention-days: 1

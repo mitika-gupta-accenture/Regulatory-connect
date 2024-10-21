@@ -1,0 +1,66 @@
+name: Node Pipeline - FA02 for UAT deployment
+# on:
+#   push:
+#     branches:
+#        - release/**
+
+on:
+  workflow_dispatch:
+
+jobs:
+  Build:
+    if: github.event.created
+    uses: ./.github/workflows/node-app-ci.yml
+    with:
+      NODE_VERSION: '20.x'
+      artifact_destination: 'GH'
+      src_path: 'backend/jobs/src'
+      app_name: 'rc-node-app-02'
+
+  SonarQube:
+    needs: Build
+    uses: ./.github/workflows/node-app-sonarqube-scan.yml
+    with:
+      src_path: 'backend/jobs/src'
+      app_name: 'rc-node-app-02'
+    secrets:
+      SonarAccessToken: ${{ secrets.SONAR_TOKEN }}
+
+  OWASP-Scan:
+    needs: Build
+    uses: ./.github/workflows/node-app-owasp-scan.yml
+    with:
+      src_path: 'backend/jobs/src'
+      app_name: 'rc-node-app-02'
+
+  Apply-App-Settings:
+    needs: SonarQube
+    uses: ./.github/workflows/node-app-config.yml
+    with:
+      environment: 'UAT'
+      CONFIG_TYPE: 'uat'
+      FUNCTION_APP_NAME: 'fa-rms-uat-uks-02'
+      resource_group: 'rg-mhra-uat-uks-rms'
+      config_path: 'backend/jobs'
+    secrets:
+      AZURE_CREDENTIALS_RC: ${{ secrets.AZURE_CREDENTIALS_RC }}
+  
+  UAT:
+    needs: Apply-App-Settings
+    uses: ./.github/workflows/node-app-deploy.yml
+    with: 
+      environment: 'UAT'
+      FUNCTION_APP_NAME: 'fa-rms-uat-uks-02' 
+      resource_group: 'rg-mhra-uat-uks-rms'
+      src_path: 'backend/jobs/src'
+      app_name: 'rc-node-app-02'
+    secrets:
+      AZURE_CREDENTIALS_RC: ${{ secrets.AZURE_CREDENTIALS_RC }}
+      REPO_READ_PAT: ${{ secrets.REPO_READ_PAT }}
+
+  DAST:
+    needs: UAT
+    uses: ./.github/workflows/node-app-DAST.yml
+    with:
+      APP_URL: ${{ needs.UAT.outputs.appurl }}
+      environment: 'UAT'     

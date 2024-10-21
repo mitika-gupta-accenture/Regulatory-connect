@@ -1,0 +1,66 @@
+{
+  "answersArr": {
+    "answers": [
+      {
+        "type": "answer",
+        "question": "What is the route of your application?",
+        "answer": "National procedure",
+        "number": 0
+      },
+      {
+        "type": "answer",
+        "question": "What is the scope of your application?",
+        "answer": "License application: marketing authorisations (including extensions)",
+        "number": 1
+      },
+      {
+        "type": "answer",
+        "question": "Has the active substance(s) of your product previously been authorised in the UK?",
+        "answer": "No",
+        "number": 2
+      },
+      {
+        "type": "answer",
+        "question": "Does your application concern an orphan medicinal product (to which point 6 of part II of annex I to the 2001 Directive applies)?",
+        "answer": "No",
+        "number": 3
+      },
+      {
+        "type": "answer",
+        "question": "How many strengths/presentations of the same dosage form are you submitting? (If it is a single submission, please leave it as 0)",
+        "answer": 3,
+        "number": 7
+      }
+    ],
+    "keyPoints": [
+      {
+        "type": "key point",
+        "question": "What is the route of your application?",
+        "identifier": "route",
+        "answer": "National",
+        "number": 0
+      },
+      {
+        "type": "key point",
+        "question": "What is the scope of your application?",
+        "identifier": "scope",
+        "answer": "National",
+        "number": 1
+      },
+      {
+        "type": "key point",
+        "question": "Does your application concern an orphan medicinal product (to which point 6 of part II of annex I to the 2001 Directive applies)?",
+        "identifier": "feeType",
+        "answer": ["Major", "Standard"],
+        "number": 3
+      },
+      {
+        "type": "key point",
+        "question": "How many strengths/presentations of the same dosage form are you submitting? (If it is a single submission, please leave it as 0)",
+        "identifier": "additionalStrengths",
+        "answer": 3,
+        "number": 7
+      }
+    ]
+  }
+}

@@ -1,0 +1,112 @@
+name: OWASP-Scan
+
+on:
+  workflow_call:
+    inputs:
+      app_name:
+        default: rc-nextjs-app
+        required: true
+        type: string
+      nexus_artifact_group_id:
+        required: false
+        type: string
+      nexus_artifact_id:
+        required: false
+        type: string
+      artifact_destination:
+        required: true
+        type: string
+        default: Github
+    
+jobs:
+  OWASP-Scan:
+    runs-on: gp-prod-runner-set
+    env:
+      # nexus_artifact_repository: Regulatory-connect
+      nexus_artifact_repository: releases
+      nexus_server: https://devops-platform.mhra.gov.uk/nexus
+    steps:
+      - name: "Cleaning up Workspace"
+        working-directory: ${{ github.workspace }}
+        run: |
+          echo "Cleaning up previous run"
+          rm -rf *
+          ls -al '${{ github.workspace }}'
+
+      - name: "Download artifact for OWASP Scan"
+        if: ${{ inputs.artifact_destination == 'Github' }}
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.app_name }}
+
+      - name: "Download artifact from Nexus"
+        if: ${{ inputs.artifact_destination == 'Nexus' }}
+        run: |
+          echo "Version: ${{ github.run_number }}"
+          echo "Nexus Artifact Name: ${{ inputs.nexus_artifact_id }}"
+          echo "Version: ${{ github.run_number }}"
+          echo "Artifact Repository: ${{ env.nexus_artifact_repository }}"
+          echo "Group Id: ${{ inputs.nexus_artifact_group_id }}"
+
+          mvn -X -D"transitive=false" \
+          -D"artifactId=${{ inputs.nexus_artifact_id }}" \
+          -D"groupId=${{ inputs.nexus_artifact_group_id }}" \
+          -D"remoteRepositories=${{ env.nexus_artifact_repository }}::default::${{ env.nexus_server }}" \
+          -D"packaging=zip" \
+          -D"dest=${{ github.workspace }}" \
+          -D"version=${{ github.run_number }}" \
+          org.apache.maven.plugins:maven-dependency-plugin:2.8:get
+
+          echo "Update artifact name"
+          mv ${{ inputs.nexus_artifact_id }}-${{ github.run_number }}.zip ${{ inputs.app_name }}.zip
+
+      - name: "Unzip"
+        run: |
+          unzip -q -o ${{ inputs.app_name }}.zip
+
+      - name: 'Retrieve owasp From Nexus'
+        run: |
+          
+          cd ${{ github.workspace }}
+
+          mvn -D"transitive=false" \
+          -D"artifactId=dependency-check" \
+          -D"packaging=zip" \
+          -D"dest=dependency-check-8.0.2.zip" \
+          -D"groupId=com.devops.owasp" \
+          -D"remoteRepositories=thirdparty::default::https://devops-platform.mhra.gov.uk/nexus" \
+          -D"version=8.0.2" \
+          org.apache.maven.plugins:maven-dependency-plugin:2.8:get \
+          -B
+          unzip -q -o dependency-check-8.0.2.zip
+
+          ./dependency-check/bin/dependency-check.sh --project "${{ inputs.app_name }}" --scan ${{ github.workspace }}/package.json --out ${{ github.workspace }}
+
+      - name: "Upload OWASP result"
+        if: ${{ inputs.artifact_destination == 'Github' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-check-report
+          path: ${{ github.workspace }}/dependency-check-report.html
+          retention-days: 1
+
+      - name: "Upload depdency-check repo to nexus"
+        if: ${{ inputs.artifact_destination == 'Nexus' }}
+        run: |
+          echo "---------------------------------------------------------"
+          echo "Nexus Artifact Name: ${{ inputs.nexus_artifact_id }}"
+          echo "Report Path: ./dependency-check-report.html"
+          echo "Version: ${{ github.run_number }}"
+          echo "Artifact Repository: ${{ env.nexus_artifact_repository }}"
+          echo "Group Id: ${{ inputs.nexus_artifact_group_id }}.dependency-check"
+          echo "---------------------------------------------------------"
+          
+          mvn -D"file=./dependency-check-report.html" \
+          -D"repositoryId=${{ env.nexus_artifact_repository }}" \
+          -D"groupId=${{ inputs.nexus_artifact_group_id }}.dependency-check" \
+          -D"url=${{ env.nexus_server }}/repository/${{ env.nexus_artifact_repository }}" \
+          -D"packaging=html" \
+          -D"artifactId=${{ inputs.nexus_artifact_id }}" \
+          -D"version=${{ github.run_number }}" \
+          -D"repositoryLayout=default" \
+          deploy:deploy-file -B

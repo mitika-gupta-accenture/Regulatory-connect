@@ -1,0 +1,80 @@
+{
+  "name": "rms-app",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@azure/msal-browser": "^3.6.0",
+    "@azure/msal-react": "^2.0.8",
+    "@reduxjs/toolkit": "^2.0.1",
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react-hooks": "^8.0.1",
+    "@testing-library/user-event": "^13.5.0",
+    "axios": "^1.6.2",
+    "dotenv": "^16.4.5",
+    "env-cmd": "^10.1.0",
+    "govuk-frontend": "^4.7.0",
+    "govuk-react": "^0.10.6",
+    "jest-environment-jsdom": "^29.7.0",
+    "pa11y": "^8.0.0",
+    "pa11y-ci": "^3.1.0",
+    "react": "^18.2.0",
+    "react-bootstrap": "^2.7.4",
+    "react-dom": "^18.2.0",
+    "react-redux": "^9.0.1",
+    "react-router-dom": "^6.13.0",
+    "react-scripts": "5.0.1",
+    "redux": "^5.0.0",
+    "sass": "^1.69.5",
+    "styled-components": "^6.1.8",
+    "web-vitals": "^2.1.4"
+  },
+  "scripts": {
+    "start": "env-cmd -f .env.development react-scripts start",
+    "build": "env-cmd -f .env.development react-scripts build",
+    "start:uat": "env-cmd -f .env.uat react-scripts start",
+    "build:uat": "env-cmd -f .env.uat react-scripts build",
+    "start:prod": "env-cmd -f .env.prod react-scripts start",
+    "build:prod": "env-cmd -f .env.prod react-scripts build",
+    "test": "jest",
+    "test:single": "jest src/core/hooks/__tests__/useEventHandlers.test.ts",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ],
+    "rules": {
+      "react-hooks/exhaustive-deps": "off",
+      "no-eval": "off"
+    }
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@babel/eslint-parser": "^7.23.3",
+    "@testing-library/dom": "^9.3.4",
+    "@testing-library/react": "^14.2.1",
+    "@types/jest": "^29.5.12",
+    "@types/react": "^18.2.55",
+    "@types/react-dom": "^18.2.18",
+    "@types/redux-mock-store": "^1.0.6",
+    "eslint": "^8.55.0",
+    "eslint-plugin-import": "^2.29.0",
+    "jest": "^29.7.0",
+    "prettier": "^3.1.0",
+    "redux-mock-store": "^1.5.4",
+    "ts-jest": "^29.1.2",
+    "typescript": "^5.3.3"
+  }
+}

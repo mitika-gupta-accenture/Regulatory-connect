@@ -1,0 +1,1404 @@
+{
+  "pages": [
+    {
+      "name": "chooseSubmissionType",
+      "showSubmitButton": true,
+      "component": "sections",
+      "events": [
+        {
+          "event": "onLoad",
+          "eventHandler": "getSubmissionTypeData"
+        },
+        {
+          "event": "onLoad",
+          "eventHandler": "getDeclarationPageData"
+        }
+      ],
+      "sections": [
+        {
+          "name": "chooseSubmissionType_1",
+          "component": "sections",
+          "layout": "two-thirds",
+          "displayOrder": 1,
+          "children": [
+            {
+              "name": "submissionTypeHeader",
+              "type": "label",
+              "text": "$$$",
+              "toolTip": "",
+              "displayOrder": 1,
+              "children": [],
+              "disabled": false,
+              "visible": true,
+              "apiDataId": "0.submissionTypeHeader"
+            },
+            {
+              "name": "guidelineLinkDisplayCaption",
+              "type": "caption",
+              "text": "$$$",
+              "toolTip": "",
+              "displayOrder": 3,
+              "children": [],
+              "disabled": false,
+              "visible": true,
+              "apiDataId": "0.guidelineLinkDisplayText"
+            }
+          ]
+        },
+        {
+          "name": "chooseSubmissionType_2",
+          "component": "sections",
+          "layout": "",
+          "displayOrder": 1,
+          "children": [
+            {
+              "name": "chooseSubmissionTypeLinks",
+              "type": "link",
+              "text": "",
+              "toolTip": "",
+              "displayOrder": 7,
+              "apiDataIdKeys": [
+                "linkDisplayText",
+                "linkURL"
+              ],
+              "disabled": false,
+              "visible": true,
+              "apiDataId": "0.link",
+              "layout": "one-half"
+            }
+          ]
+        },
+        {
+          "name": "chooseSubmissionType_3",
+          "component": "sections",
+          "layout": "two-thirds",
+          "displayOrder": 1,
+          "children": [
+            {
+              "name": "declarationStatementParagraph",
+              "type": "paragraph",
+              "text": "$$$",
+              "toolTip": "",
+              "displayOrder": 1,
+              "children": [],
+              "disabled": false,
+              "visible": true,
+              "apiDataId": "declarationStatement",
+              "layout": ""
+            },
+            {
+              "name": "declarationStatementcheckBoxHeader",
+              "type": "paragraph",
+              "text": "$$$",
+              "toolTip": "",
+              "displayOrder": 1,
+              "children": [],
+              "disabled": false,
+              "visible": true,
+              "apiDataId": "checkBoxHeader",
+              "layout": ""
+            },
+            {
+              "name": "declarationStatementcheckBoxBody",
+              "type": "checkboxes",
+              "text": "",
+              "value": "select",
+              "checked": false,
+              "toolTip": "",
+              "displayOrder": 8,
+              "disabled": false,
+              "visible": true,
+              "events": [
+                {
+                  "event": "onClick",
+                  "eventHandler": "handleChange"
+                }
+              ],
+              "options": [
+                {
+                  "title": "$$$|checkBoxBody",
+                  "value": "yes"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "selectCustomerAccount",
+      "showSubmitButton": true,
+      "component": "sections",
+      "events": [
+        {
+          "event": "onLoad",
+          "eventHandler": "getServiceParameter"
+        }
+      ],
+      "sections": [
+        {
+          "name": "selectCustomerAccount_1",
+          "component": "sections",
+          "layout": "two-thirds",
+          "displayOrder": 1,
+          "children": [
+            {
+              "name": "panelGenerationSuccessfulSingle",
+              "type": "panel",
+              "text": "Generation successful",
+              "toolTip": "",
+              "displayOrder": 1,
+              "children": [
+                {
+                  "type": "paragraph",
+                  "text": "Your licence number is $$$",
+                  "apiDataId": "territory",
+                  "visibilityCondition": "changeCompanyInput === '1'"
+                },
+                {
+                  "type": "paragraph",
+                  "text": "$$$",
+                  "apiDataId": "applicationType",
+                  "visibilityCondition": ""
+                },
+                {
+                  "type": "paragraph",
+                  "text": "<datetime>",
+                  "apiDataId": "123",
+                  "visibilityCondition": "changeCompanyInput !== '1'"
+                }
+              ],
+              "disabled": false,
+              "visible": true,
+              "visibilityCondition": "",
+              "apiDataId": "",
+              "showDateTime": true
+            },
+            {
+              "name": "selectApplicationLabelCaption",
+              "type": "caption",
+              "text": "Tailor your application",
+              "toolTip": "tooltip info",
+              "displayOrder": 1,
+              "children": [],
+              "disabled": false,
+              "visible": true
+            },
+            {
+              "name": "selectCompanyLabel",
+              "type": "label",
+              "text": "Company name",
+              "toolTip": "company",
+              "displayOrder": 2,
+              "children": [],
+              "disabled": false,
+              "visible": true
+            },
+            {
+              "name": "selectProposalLabel",
+              "type": "caption",
+              "text": "Proposed marketing authorization holder",
+              "toolTip": "",
+              "displayOrder": 3,
+              "children": [],
+              "disabled": false,
+              "visible": true
+            },
+            {
+              "name": "insetTextMessage",
+              "type": "inset",
+              "text": "Remember to include the same licence number on all documents from the same application.",
+              "toolTip": "",
+              "displayOrder": 7,
+              "children": [],
+              "disabled": false,
+              "visible": true,
+              "apiDataId": "changeCompanyInput"
+            }
+          ]
+        },
+        {
+          "name": "selectCustomerAccount_2",
+          "component": "sections",
+          "layout": "two-thirds",
+          "displayOrder": 2,
+          "children": [
+            {
+              "name": "selectCompanyDropdown",
+              "type": "select",
+              "value": "",
+              "required": true,
+              "options": [
+                {
+                  "title": "Select a company",
+                  "value": ""
+                },
+                {
+                  "title": "Option 1",
+                  "value": "Option 1"
+                },
+                {
+                  "title": "Option 2",
+                  "value": "Option 2"
+                },
+                {
+                  "title": "Option 3",
+                  "value": "Option 3"
+                }
+              ],
+              "readOnly": false,
+              "multiple": false,
+              "disabled": false,
+              "toolTip": "",
+              "text": "",
+              "displayOrder": 4,
+              "events": [
+                {
+                  "event": "onChange",
+                  "eventHandler": "handleChange"
+                }
+              ],
+              "error": "This is a required field",
+              "apiDataId": "applicationType"
+            },
+            {
+              "name": "selectWarningLabel",
+              "type": "hintlabel",
+              "text": "Generate multiple numbers",
+              "detailsText": "",
+              "cms-dataid": "",
+              "toolTip": "",
+              "displayOrder": 5,
+              "children": [
+                {
+                  "name": "changeCompanyInput",
+                  "type": "input",
+                  "text": "Enter a number between 1 and 100.",
+                  "toolTip": "",
+                  "displayOrder": 1,
+                  "disabled": false,
+                  "visible": true,
+                  "size": "",
+                  "events": [
+                    {
+                      "event": "onChange",
+                      "eventHandler": "handleChange"
+                    }
+                  ],
+                  "value": "1",
+                  "errorMessage": "This is a required field",
+                  "style": {
+                    "width": "68px"
+                  }
+                },
+                {
+                  "name": "inputFieldLabel2",
+                  "type": "caption",
+                  "text": "All numbers generated will be for the same company, application type and territory.",
+                  "toolTip": "tooltip info",
+                  "displayOrder": 2,
+                  "children": [],
+                  "disabled": false,
+                  "visible": true
+                }
+              ],
+              "disabled": false,
+              "visible": true
+            },
+            {
+              "name": "datesAndAmountsTable",
+              "type": "table",
+              "displayOrder": 6,
+              "visible": true,
+              "toolTip": "",
+              "disabled": false,
+              "children": [
+                {
+                  "name": "tableHeader",
+                  "type": "tableHeader",
+                  "columns": []
+                },
+                {
+                  "name": "tableBody",
+                  "type": "tableBody",
+                  "rows": [
+                    [
+                      "Company",
+                      "Company Name Ltd"
+                    ],
+                    [
+                      "Application type",
+                      "###|selectCompanyDropdown"
+                    ],
+                    [
+                      "Territory",
+                      "$$$|territory"
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "pageButtons",
+              "type": "buttons",
+              "text": "",
+              "toolTip": "",
+              "displayOrder": 7,
+              "children": [
+                {
+                  "name": "continueButton",
+                  "type": "button",
+                  "text": "Continue",
+                  "toolTip": "",
+                  "displayOrder": 7,
+                  "children": [],
+                  "disabled": false,
+                  "visible": true,
+                  "className": "govuk-button--warning",
+                  "navigationCondition": "(selectCompanyDropdown === 'Biological' && changeCompanyInput === '1') ? 'biologicalSubstance' : selectCompanyDropdown === 'Herbal' ? 'applicationType' : ''",
+                  "events": [
+                    {
+                      "event": "onClick",
+                      "eventHandler": "handleConditionalNavigation"
+                    }
+                  ]
+                },
+                {
+                  "name": "cancelButton",
+                  "type": "button",
+                  "text": "Cancel",
+                  "theme": "secondary",
+                  "size": "small",
+                  "toolTip": "",
+                  "displayOrder": 7,
+                  "children": [],
+                  "disabled": false,
+                  "visible": true,
+                  "className": "govuk-button--secondary"
+                }
+              ],
+              "disabled": false,
+              "visible": true,
+              "className": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "submitApplicationForm",
+      "showSubmitButton": true,
+      "sections": [
+        {
+          "name": "submitApplicationForm_1",
+          "component": "sections",
+          "layout": "full",
+          "displayOrder": 1,
+          "children": [
+            {
+              "name": "selectApplicationLabelCaption2",
+              "type": "caption",
+              "text": "Tailor your application",
+              "toolTip": "",
+              "displayOrder": 1,
+              "children": [],
+              "disabled": false,
+              "visible": true
+            },
+            {
+              "name": "selectAuthHolderLabel1",
+              "type": "label",
+              "text": "Proposed market authorization holder",
+              "toolTip": "",
+              "displayOrder": 2,
+              "children": [],
+              "disabled": false,
+              "visible": true
+            },
+            {
+              "name": "selectOrgInfoLabel",
+              "type": "list",
+              "summaryText": "Organization:",
+              "detailsText": "Big Company Ltd",
+              "summaryText1": "Address:",
+              "detailsText1": "Mayson House \nMaynard Industrial Estate \n Halifax \n HX4 6TY \n UK",
+              "toolTip": "",
+              "displayOrder": 3,
+              "children": [],
+              "disabled": false,
+              "visible": true
+            },
+            {
+              "name": "selectDetailsCorrectRadioGroup",
+              "type": "radios",
+              "text": "Are these details correct?",
+              "toolTip": "",
+              "displayOrder": 5,
+              "options": [
+                {
+                  "title": "Yes",
+                  "value": "Yes"
+                },
+                {
+                  "title": "No",
+                  "value": "No"
+                }
+              ],
+              "children": [],
+              "disabled": false,
+              "visible": true,
+              "events": [
+                {
+                  "event": "onChange",
+                  "eventHandler": "handleChange"
+                }
+              ]
+            },
+            {
+              "name": "chooseSubmissionTypeLink",
+              "type": "link",
+              "text": "Return to Choose submission type",
+              "toolTip": "",
+              "displayOrder": 7,
+              "children": [],
+              "disabled": false,
+              "visible": true,
+              "className": "",
+              "events": [
+                {
+                  "event": "onClick",
+                  "eventHandler": "handleConditionalNavigation"
+                }
+              ]
+            },
+            {
+              "name": "continueButton",
+              "type": "button",
+              "text": "Continue",
+              "toolTip": "",
+              "displayOrder": 8,
+              "children": [],
+              "disabled": false,
+              "visible": true,
+              "className": "govuk-button--disabled",
+              "events": [
+                {
+                  "event": "onClick",
+                  "eventHandler": "handleConditionalNavigation"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "applicationType",
+      "showSubmitButton": true,
+      "sections": [
+        {
+          "name": "submitApplicationForm_1",
+          "component": "sections",
+          "layout": "full",
+          "displayOrder": 1,
+          "children": [
+            {
+              "name": "selectAppTypeRadio",
+              "type": "radios",
+              "text": "What is the application type?",
+              "toolTip": "Select one of the options below",
+              "displayOrder": 1,
+              "children": [],
+              "disabled": false,
+              "visible": true,
+              "events": [
+                {
+                  "event": "onChange",
+                  "eventHandler": "handleChange"
+                }
+              ],
+              "options": [
+                {
+                  "title": "Biological",
+                  "value": "biological",
+                  "children": [
+                    {
+                      "name": "selectAtmpCheckbox",
+                      "type": "checkboxes",
+                      "text": "",
+                      "value": "select",
+                      "checked": false,
+                      "toolTip": "Select all the types that apply",
+                      "displayOrder": 8,
+                      "disabled": false,
+                      "visible": true,
+                      "events": [
+                        {
+                          "event": "onClick",
+                          "eventHandler": "handleChange"
+                        }
+                      ],
+                      "options": [
+                        {
+                          "title": "ATMP",
+                          "value": "atmp"
+                        },
+                        {
+                          "title": "Blood derived medicinal product",
+                          "value": "bloodDerived"
+                        },
+                        {
+                          "title": "Non-recombinant (extracted) protein",
+                          "value": "nonRecombinant"
+                        },
+                        {
+                          "title": "Recombinant protein",
+                          "value": "recombinant"
+                        },
+                        {
+                          "title": "Urine derived medicinal product",
+                          "value": "urineDerived"
+                        },
+                        {
+                          "title": "Vaccine",
+                          "value": "vaccine"
+                        },
+                        {
+                          "title": "Other biological product",
+                          "value": "otherBio"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "Chemical",
+                  "value": "chemical"
+                },
+                {
+                  "title": "Herbal",
+                  "value": "herbal"
+                },
+                {
+                  "title": "Traditional Herbal Registration",
+                  "value": "traditionalHerbal"
+                },
+                {
+                  "title": "Simplified Homeopathic Registration (HR)",
+                  "value": "homeoHR"
+                },
+                {
+                  "title": "Homeopathic National Rules",
+                  "value": "homeoNat"
+                }
+              ]
+            },
+            {
+              "name": "continueButton",
+              "type": "button",
+              "text": "Continue",
+              "toolTip": "",
+              "displayOrder": 7,
+              "children": [],
+              "disabled": false,
+              "visible": true,
+              "events": [
+                {
+                  "event": "onClick",
+                  "eventHandler": "handleConditionalNavigation"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "biologicalSubstance",
+      "showSubmitButton": true,
+      "sections": [
+        {
+          "name": "submitApplicationForm_1",
+          "component": "sections",
+          "layout": "full",
+          "displayOrder": 1,
+          "children": [
+            {
+              "name": "applicationLabelCaptioned",
+              "type": "caption",
+              "text": "Tailor your application",
+              "toolTip": "",
+              "displayOrder": 1,
+              "children": [],
+              "disabled": false,
+              "visible": true
+            },
+            {
+              "name": "bioSubstanceCheckbox",
+              "type": "checkboxes",
+              "text": "What biological substance apply",
+              "value": "select",
+              "checked": false,
+              "toolTip": "Select all that apply",
+              "displayOrder": 2,
+              "disabled": false,
+              "visible": true,
+              "eventHandler": "handleChange",
+              "events": [
+                {
+                  "event": "onClick",
+                  "eventHandler": "handleChange"
+                }
+              ],
+              "options": [
+                {
+                  "title": "Biosimilar",
+                  "value": "biosimilar"
+                },
+                {
+                  "title": "Biological conjugated to a chemical entity",
+                  "value": "bioConjugate"
+                },
+                {
+                  "title": "Product manufactured at the point of care",
+                  "value": "pointCare"
+                },
+                {
+                  "title": "Vaccine adjuvanted",
+                  "value": "vaccineAdjuvant"
+                }
+              ]
+            },
+            {
+              "name": "continueButton",
+              "type": "button",
+              "text": "Continue",
+              "toolTip": "",
+              "displayOrder": 3,
+              "children": [],
+              "disabled": false,
+              "visible": true,
+              "events": [
+                {
+                  "event": "onClick",
+                  "eventHandler": "handleConditionalNavigation"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "updateCompanyDetails",
+      "component": "sections",
+      "showSubmitButton": false,
+      "sections": [
+        {
+          "name": "submitApplicationForm_1",
+          "component": "sections",
+          "layout": "full",
+          "displayOrder": 1,
+          "children": [
+            {
+              "name": "changeCompanyLabel",
+              "type": "label",
+              "text": "Change company details",
+              "toolTip": "",
+              "displayOrder": 1,
+              "children": [],
+              "disabled": false,
+              "visible": true
+            },
+            {
+              "name": "para1",
+              "type": "paragraph",
+              "text": "Before you can continue with this application you need to make sure that the contact details are correct.",
+              "displayOrder": 2,
+              "children": [],
+              "disabled": false,
+              "visible": true
+            },
+            {
+              "name": "para2",
+              "type": "paragraph",
+              "text": "Please contact the reference data team (reference.data@ombra.gov.uk) with the correct details so they can update the system.",
+              "displayOrder": 3,
+              "children": [],
+              "disabled": false,
+              "visible": true
+            },
+            {
+              "name": "gotoApplicationHomeSentence",
+              "type": "sentence",
+              "text": "Go to application home",
+              "displayOrder": 4,
+              "children": [],
+              "disabled": false,
+              "visible": true
+            },
+            {
+              "name": "continueButton",
+              "type": "button",
+              "text": "Continue",
+              "toolTip": "",
+              "displayOrder": 7,
+              "children": [],
+              "disabled": false,
+              "visible": true,
+              "events": [
+                {
+                  "event": "onClick",
+                  "eventHandler": "handleConditionalNavigation"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "tradingStyleRegistration",
+      "showSubmitButton": true,
+      "component": "sections",
+      "sections": [
+        {
+          "name": "submitApplicationForm_1",
+          "component": "sections",
+          "layout": "full",
+          "displayOrder": 1,
+          "children": [
+            {
+              "name": "applicationLabelCaption",
+              "type": "caption",
+              "text": "Tailor your application",
+              "toolTip": "",
+              "displayOrder": 1,
+              "children": [],
+              "disabled": false,
+              "visible": true
+            },
+            {
+              "name": "registerTradeStyleHeading",
+              "type": "heading",
+              "text": "Do you want to register a trading style for this product?",
+              "toolTip": "",
+              "displayOrder": 2,
+              "children": [],
+              "disabled": false,
+              "visible": true
+            },
+            {
+              "name": "registerTradeStyleRadio",
+              "type": "radio",
+              "text": "Yes",
+              "value": "yes",
+              "checked": false,
+              "toolTip": "",
+              "displayOrder": 3,
+              "children": [
+                {
+                  "name": "tradingNameLabel",
+                  "type": "label",
+                  "value": "trade",
+                  "checked": false,
+                  "text": "Trading name",
+                  "visible": false,
+                  "displayOrder": 1,
+                  "disabled": true
+                },
+                {
+                  "name": "tradingNameInput",
+                  "type": "input",
+                  "value": "input",
+                  "checked": false,
+                  "text": "Start typing your trading name",
+                  "visible": false,
+                  "displayOrder": 1
+                },
+                {
+                  "name": "tradingNameWarning",
+                  "type": "labelwarning",
+                  "summaryText": "I can't find my trading name",
+                  "detailsText": "TBC",
+                  "value": "trade",
+                  "checked": false,
+                  "toolTip": "",
+                  "displayOrder": 4,
+                  "children": [],
+                  "disabled": false,
+                  "visible": true
+                }
+              ],
+              "disabled": false,
+              "visible": true
+            },
+            {
+              "name": "registerTradeStyleRadioNo",
+              "type": "radio",
+              "text": "No",
+              "value": "No",
+              "checked": false,
+              "toolTip": "",
+              "displayOrder": 4,
+              "children": [],
+              "disabled": false,
+              "visible": true
+            },
+            {
+              "name": "continueButton",
+              "type": "button",
+              "text": "Continue",
+              "toolTip": "",
+              "displayOrder": 7,
+              "children": [],
+              "disabled": false,
+              "visible": true,
+              "events": [
+                {
+                  "event": "onClick",
+                  "eventHandler": "handleConditionalNavigation"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "smeStatusUK",
+      "showSubmitButton": true,
+      "component": "sections",
+      "sections": [
+        {
+          "name": "submitApplicationForm_1",
+          "component": "sections",
+          "layout": "full",
+          "displayOrder": 1,
+          "children": [
+            {
+              "name": "applicationLabelCaption",
+              "type": "caption",
+              "text": "Tailor your application",
+              "toolTip": "",
+              "displayOrder": 1,
+              "children": [],
+              "disabled": false,
+              "visible": true
+            },
+            {
+              "name": "registerMarketStyleHeading",
+              "type": "heading",
+              "text": "Does the marketing authorisation holder have SME status in the UK?",
+              "toolTip": "",
+              "displayOrder": 2,
+              "children": [],
+              "disabled": false,
+              "visible": true
+            },
+            {
+              "name": "registerTradeStyleRadio",
+              "type": "radio",
+              "text": "Yes",
+              "value": "yes",
+              "checked": false,
+              "toolTip": "",
+              "displayOrder": 3,
+              "children": [
+                {
+                  "name": "dateNameLabel",
+                  "type": "label",
+                  "value": "date",
+                  "checked": false,
+                  "text": "Date of Expiry",
+                  "visible": false,
+                  "displayOrder": 1,
+                  "disabled": true
+                },
+                {
+                  "name": "dateNameInput",
+                  "type": "label",
+                  "value": "input",
+                  "checked": false,
+                  "hintText": "For example, 27 3 2027",
+                  "dayText": "Day",
+                  "monthText": "Month",
+                  "yearText": "Year",
+                  "visible": false,
+                  "displayOrder": 1
+                }
+              ],
+              "disabled": false,
+              "visible": true
+            },
+            {
+              "name": "registerTradeStyleRadioNo",
+              "type": "radio",
+              "text": "No",
+              "value": "No",
+              "checked": false,
+              "toolTip": "",
+              "displayOrder": 4,
+              "children": [],
+              "disabled": false,
+              "visible": true
+            },
+            {
+              "name": "annexWarning",
+              "type": "label",
+              "text": "Remember to attach a copy of the 'Qualification of SME Status' to Annex 5.7",
+              "checked": false,
+              "toolTip": "",
+              "displayOrder": 4,
+              "children": [],
+              "disabled": false,
+              "visible": true
+            },
+            {
+              "name": "continueButton",
+              "type": "button",
+              "text": "Continue",
+              "toolTip": "",
+              "displayOrder": 7,
+              "children": [],
+              "disabled": false,
+              "visible": true,
+              "events": [
+                {
+                  "event": "onClick",
+                  "eventHandler": "handleConditionalNavigation"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "productTerritory",
+      "showSubmitButton": true,
+      "component": "sections",
+      "sections": [
+        {
+          "name": "submitApplicationForm_1",
+          "component": "sections",
+          "layout": "full",
+          "displayOrder": 1,
+          "children": [
+            {
+              "name": "applicationLabelCaption",
+              "type": "caption",
+              "text": "Tailor your application",
+              "toolTip": "",
+              "displayOrder": 1,
+              "children": [],
+              "disabled": false,
+              "visible": true
+            },
+            {
+              "name": "territoryStyleHeading",
+              "type": "heading",
+              "text": "Which territory will your product be sold in?",
+              "toolTip": "",
+              "displayOrder": 2,
+              "children": [],
+              "disabled": false,
+              "visible": true
+            },
+            {
+              "name": "countryNameOne",
+              "type": "radio",
+              "text": "United Kingdom",
+              "value": "United Kingdom",
+              "checked": false,
+              "toolTip": "",
+              "displayOrder": 3,
+              "children": [
+                {
+                  "name": "regulationName",
+                  "type": "label",
+                  "checked": false,
+                  "text": "Does this application fall under the mandatory scope as defined in Article 3(1) of regulation (EC) No 726/2004?",
+                  "visible": false,
+                  "displayOrder": 1,
+                  "disabled": true
+                },
+                {
+                  "name": "registerTradeStyleRadioYes",
+                  "type": "radio",
+                  "text": "Yes",
+                  "value": "yes",
+                  "checked": false,
+                  "toolTip": "",
+                  "displayOrder": 2
+                },
+                {
+                  "name": "registerTradeStyleRadioNo",
+                  "type": "radio",
+                  "text": "No",
+                  "value": "No",
+                  "checked": false,
+                  "toolTip": "",
+                  "displayOrder": 2
+                }
+              ],
+              "disabled": false,
+              "visible": true
+            },
+            {
+              "name": "countryNameTwo",
+              "type": "radio",
+              "text": "Great Britain",
+              "value": "Great Britain",
+              "checked": false,
+              "toolTip": "",
+              "displayOrder": 4,
+              "children": [
+                {
+                  "name": "regulationName",
+                  "type": "label",
+                  "checked": false,
+                  "text": "Does this application fall under the mandatory scope as defined in Article 3(1) of regulation (EC) No 726/2004?",
+                  "visible": false,
+                  "displayOrder": 1,
+                  "disabled": true
+                },
+                {
+                  "name": "registerTradeStyleRadioYes",
+                  "type": "radio",
+                  "text": "Yes",
+                  "value": "yes",
+                  "checked": false,
+                  "toolTip": "",
+                  "displayOrder": 2
+                },
+                {
+                  "name": "registerTradeStyleRadioNo",
+                  "type": "radio",
+                  "text": "No",
+                  "value": "No",
+                  "checked": false,
+                  "toolTip": "",
+                  "displayOrder": 2
+                }
+              ],
+              "disabled": false,
+              "visible": true
+            },
+            {
+              "name": "countryNameThree",
+              "type": "radio",
+              "text": "Northern Ireland",
+              "value": "Northern Ireland",
+              "checked": false,
+              "toolTip": "",
+              "displayOrder": 4,
+              "children": [
+                {
+                  "name": "regulationName",
+                  "type": "label",
+                  "checked": false,
+                  "text": "Does this application fall under the mandatory scope as defined in Article 3(1) of regulation (EC) No 726/2004?",
+                  "visible": false,
+                  "displayOrder": 1,
+                  "disabled": true
+                },
+                {
+                  "name": "registerTradeStyleRadioYes",
+                  "type": "radio",
+                  "text": "Yes",
+                  "value": "yes",
+                  "checked": false,
+                  "toolTip": "",
+                  "displayOrder": 2
+                },
+                {
+                  "name": "registerTradeStyleRadioNo",
+                  "type": "radio",
+                  "text": "No",
+                  "value": "No",
+                  "checked": false,
+                  "toolTip": "",
+                  "displayOrder": 2
+                }
+              ],
+              "disabled": false,
+              "visible": true
+            },
+            {
+              "name": "continueButton",
+              "type": "button",
+              "text": "Continue",
+              "toolTip": "",
+              "displayOrder": 7,
+              "children": [],
+              "disabled": false,
+              "visible": true,
+              "events": [
+                {
+                  "event": "onClick",
+                  "eventHandler": "handleConditionalNavigation"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "applicationArea",
+      "showSubmitButton": true,
+      "component": "sections",
+      "sections": [
+        {
+          "name": "submitApplicationForm_1",
+          "component": "sections",
+          "layout": "full",
+          "displayOrder": 1,
+          "children": [
+            {
+              "name": "applicationLabelCaption",
+              "type": "caption",
+              "text": "Tailor your application",
+              "toolTip": "",
+              "displayOrder": 1,
+              "children": [],
+              "disabled": false,
+              "visible": true
+            },
+            {
+              "name": "areaStyleHeading",
+              "type": "heading",
+              "text": "Which area does your application relate to?",
+              "toolTip": "",
+              "displayOrder": 2,
+              "children": [],
+              "disabled": false,
+              "visible": true
+            },
+            {
+              "name": "captionSelect",
+              "type": "caption",
+              "text": "Select one",
+              "toolTip": "",
+              "displayOrder": 3,
+              "children": [],
+              "disabled": false,
+              "visible": true
+            },
+            {
+              "name": "appNameOne",
+              "type": "radio",
+              "text": "National procedure",
+              "value": "National procedure",
+              "checked": false,
+              "toolTip": "",
+              "displayOrder": 3,
+              "children": [],
+              "disabled": false,
+              "visible": true
+            },
+            {
+              "name": "appNameTwo",
+              "type": "radio",
+              "text": "National procedure Access Consortium",
+              "value": "National procedure Access Consortium",
+              "checked": false,
+              "toolTip": "",
+              "displayOrder": 4,
+              "children": [],
+              "disabled": false,
+              "visible": true
+            },
+            {
+              "name": "appNameThree",
+              "type": "radio",
+              "text": "National procedure-Project Orbis",
+              "value": "National procedure-Project Orbis",
+              "checked": false,
+              "toolTip": "",
+              "displayOrder": 4,
+              "children": [
+                {
+                  "name": "typeName",
+                  "type": "label",
+                  "checked": false,
+                  "text": "Select type:",
+                  "visible": false,
+                  "displayOrder": 1,
+                  "disabled": true
+                },
+                {
+                  "name": "typeOne",
+                  "type": "radio",
+                  "text": "Type A",
+                  "value": "Type A",
+                  "checked": false,
+                  "toolTip": "",
+                  "displayOrder": 2
+                },
+                {
+                  "name": "typeTwo",
+                  "type": "radio",
+                  "text": "Type B",
+                  "value": "Type B",
+                  "checked": false,
+                  "toolTip": "",
+                  "displayOrder": 2
+                },
+                {
+                  "name": "typeThree",
+                  "type": "radio",
+                  "text": "Type C",
+                  "value": "Type C",
+                  "checked": false,
+                  "toolTip": "",
+                  "displayOrder": 2
+                }
+              ],
+              "disabled": false,
+              "visible": true
+            },
+            {
+              "name": "appNameFour",
+              "type": "radio",
+              "text": "Unfettered Access Procedure (UAP)",
+              "value": "Unfettered Access Procedure (UAP)",
+              "checked": false,
+              "toolTip": "",
+              "displayOrder": 3,
+              "children": [],
+              "disabled": false,
+              "visible": true
+            },
+            {
+              "name": "appNameFive",
+              "type": "radio",
+              "text": "European Commission Decision Reliance Procedure (ECDRP)",
+              "value": "European Commission Decision Reliance Procedure (ECDRP)",
+              "checked": false,
+              "toolTip": "",
+              "displayOrder": 3,
+              "children": [],
+              "disabled": false,
+              "visible": true
+            },
+            {
+              "name": "appNameSix",
+              "type": "radio",
+              "text": "MRDC Reliance Procedure (MRDCRP)",
+              "value": "MRDC Reliance Procedure (MRDCRP)",
+              "checked": false,
+              "toolTip": "",
+              "displayOrder": 3,
+              "children": [],
+              "disabled": false,
+              "visible": true
+            },
+            {
+              "name": "continueButton",
+              "type": "button",
+              "text": "Continue",
+              "toolTip": "",
+              "displayOrder": 7,
+              "children": [],
+              "disabled": false,
+              "visible": true,
+              "events": [
+                {
+                  "event": "onClick",
+                  "eventHandler": "handleConditionalNavigation"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "menuItems",
+      "showSubmitButton": true,
+      "component": "sections",
+      "sections": [
+        {
+          "name": "submitApplicationForm_1",
+          "component": "sections",
+          "layout": "full",
+          "displayOrder": 1,
+          "children": [
+            {
+              "name": "progressCheckMenuItem",
+              "type": "menuItem",
+              "text": "Check your progress",
+              "link": "#",
+              "displayOrder": 1,
+              "children": [],
+              "disabled": false,
+              "visible": true
+            },
+            {
+              "name": "tailorApplicationMenuItem",
+              "type": "menuItem",
+              "text": "Tailor your application",
+              "link": "#",
+              "displayOrder": 2,
+              "children": [],
+              "disabled": false,
+              "visible": true
+            },
+            {
+              "name": "fillApplicationMenuItem",
+              "type": "menuItem",
+              "text": "Fill in your application",
+              "link": "#",
+              "displayOrder": 3,
+              "children": [],
+              "disabled": false,
+              "visible": true
+            },
+            {
+              "name": "checkAnswersMenuItem",
+              "type": "menuItem",
+              "text": "Check your answers",
+              "link": "#",
+              "displayOrder": 4,
+              "children": [],
+              "disabled": false,
+              "visible": true
+            },
+            {
+              "name": "submitApplicationMenuItem",
+              "type": "menuItem",
+              "text": "Submit your application",
+              "link": "#",
+              "displayOrder": 5,
+              "children": [],
+              "disabled": false,
+              "visible": true
+            },
+            {
+              "name": "feedbackMenuItem",
+              "type": "menuItem",
+              "text": "Provide feedback",
+              "link": "#",
+              "displayOrder": 6,
+              "children": [],
+              "disabled": false,
+              "visible": true
+            },
+            {
+              "name": "paymentInstructionMenuItem",
+              "type": "menuItem",
+              "text": "How to pay",
+              "link": "#",
+              "displayOrder": 7,
+              "children": [],
+              "disabled": false,
+              "visible": true
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

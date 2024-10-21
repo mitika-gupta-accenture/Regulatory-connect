@@ -1,0 +1,44 @@
+[
+  {
+    "title": "Applications",
+    "description": "Manage the submission status of your application.",
+    "linkText": "Go to Applications",
+    "linkHref": "/application",
+    "columnClassName": "one-third"
+  },
+  {
+    "title": "Licences",
+    "description": "Manage the authorisation status of your licences.",
+    "linkText": "Go to Licences",
+    "linkHref": "/licences",
+    "columnClassName": "one-third"
+  },
+  {
+    "title": "Submission types",
+    "description": "Start and manage your applications, including bulk submissions.",
+    "linkText": "Go to Choose a submission type",
+    "linkHref": "/choose-submission-type",
+    "columnClassName": "one-third"
+  },
+  {
+    "title": "Account management",
+    "description": "View and manage your organisation's details, manage users, and apply for SME status.",
+    "linkText": "Go to Account management",
+    "linkHref": "/dashboard/account-management",
+    "columnClassName": "one-third"
+  },
+  {
+    "title": "Billing",
+    "description": "Manage your organisation's billing and payment history.",
+    "linkText": "Go to Billing",
+    "linkHref": "/billing",
+    "columnClassName": "one-third"
+  },
+  {
+    "title": "Contact MHRA",
+    "description": "Submit an enquiry to MHRA using our online form.",
+    "linkText": "Contact MHRA",
+    "linkHref": "/contactmhra",
+    "columnClassName": "one-third"
+  }
+]

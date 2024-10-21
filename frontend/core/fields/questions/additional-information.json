@@ -1,0 +1,30 @@
+[
+  {
+    "sectionName": "Additional information",
+    "identifier": "additional-information",
+    "question": "Do you have any other information about the website?",
+    "fields": [
+      {
+        "type": "paragraph",
+        "content": [
+          "For example:",
+          "<ul>",
+          "<li>an email from the seller</li>",
+          "<li>the seller's address or other personal information</li>",
+          "<li>your order confirmation</li>",
+          "<li>the payment processor</li>",
+          "<li>if you never received your order</li>",
+          "</ul>"
+        ]
+      },
+      {
+        "identifier": "additional-information-input",
+        "type": "textarea",
+        "label": "Any other information about the website or seller (optional)",
+        "className": "govuk-!-font-weight-bold",
+        "characterLimit": 200
+      }
+    ],
+    "route": "are-you-willing-to-be-contacted"
+  }
+]

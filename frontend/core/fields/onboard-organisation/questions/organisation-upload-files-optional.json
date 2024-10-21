@@ -1,0 +1,22 @@
+[
+  {
+    "sectionName": "Onboard an organisation",
+    "identifier": "organisation-upload-files-optional",
+    "question": "Upload FILES",
+    "route": "check-and-confirm-answers",
+    "fields": [
+      {
+        "type": "paragraph",
+        "content": ["<strong>Upload one or more files<strong>"]
+      },
+      {
+        "type": "paragraph",
+        "content": ["<strong>Uploaded files<strong>"]
+      },
+      {
+        "type": "paragraph",
+        "content": ["Ensure all files have been uploaded before continuing."]
+      }
+    ]
+  }
+]

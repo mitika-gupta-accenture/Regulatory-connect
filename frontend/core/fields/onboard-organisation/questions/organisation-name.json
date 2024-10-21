@@ -1,0 +1,51 @@
+[
+  {
+    "sectionName": "Onboard an organisation",
+    "identifier": "organisation-name",
+    "question": "Enter your organisation's name",
+    "route": "organisation-legal-status-non-uk",
+    "isCancelButtonRequired": false,
+    "fields": [
+      {
+        "identifier": "organisation-name-text",
+        "type": "text",
+        "label": "Enter the official name of your organisation",
+        "hint": "This is the registered name of your organisation - for example, your limited company's name",
+        "validations": [
+          {
+            "required": "You must enter the name of your organisation"
+          }
+        ],
+        "errorMessage": "You must enter the name of your organisation",
+        "size": 40
+      },
+      {
+        "identifier": "organisation-name-text-confirmation",
+        "type": "text",
+        "label": "Confirm the name of your organisation.",
+        "validations": [
+          {
+            "required": "You must confirm the name of your organisation",
+            "is-equal-to": "Make sure the given organisation names match"
+          }
+        ],
+        "isEqualTo": "organisation-name-text",
+        "errorMessage": "You must confirm the name of your organisation",
+        "size": 40
+      },
+      {
+        "identifier": "organisation-company-tax-number",
+        "type": "text",
+        "label": "Enter your company tax number",
+        "hint": "Your company tax number is your unique taxpayer reference (UTR) number and consists of 10 digits.",
+        "validations": [
+          {
+            "required": "You must enter your company tax number"
+          }
+        ],
+        "errorMessage": "You must enter your company tax number",
+        "size": 10
+      }
+    ]
+  }
+]

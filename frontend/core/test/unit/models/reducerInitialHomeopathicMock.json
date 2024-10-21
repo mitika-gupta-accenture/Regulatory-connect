@@ -1,0 +1,70 @@
+{
+  "answers": [
+    {
+      "type": "answer",
+      "question": "What is the route of your application?",
+      "answer": "National procedure",
+      "number": 0
+    },
+    {
+      "type": "answer",
+      "question": "What is the scope of your application?",
+      "answer": "Homoeopathic - national rules scheme",
+      "number": 1
+    },
+    {
+      "type": "answer",
+      "question": "How many stocks does your homoeopathic medicinal product contain?",
+      "answer": 1,
+      "number": 13
+    },
+    {
+      "type": "answer",
+      "question": "Have all the stocks in your homoeopathic medicinal product been assessed and approved previously?",
+      "answer": "Yes",
+      "number": 14
+    },
+    {
+      "type": "answer",
+      "question": "Has the formulation of your homoeopathic medicinal product been assessed and approved previously?",
+      "answer": "Yes",
+      "number": 15
+    },
+    {
+      "type": "answer",
+      "question": "Does any of the following apply to your homoeopathic medicinal product(s)?",
+      "answer": "New method of sterilisation (non-pharmacopoeial)",
+      "number": 17
+    }
+  ],
+  "keyPoints": [
+    {
+      "type": "key point",
+      "question": "What is the route of your application?",
+      "identifier": "route",
+      "answer": "National",
+      "number": 0
+    },
+    {
+      "type": "key point",
+      "question": "What is the scope of your application?",
+      "identifier": "scope",
+      "answer": "HNRS",
+      "number": 1
+    },
+    {
+      "type": "key point",
+      "question": "How many stocks does your homoeopathic medicinal product contain?",
+      "identifier": "homeopathicStocks",
+      "answer": 1,
+      "number": 13
+    },
+    {
+      "type": "key point",
+      "question": "Has the formulation of your homoeopathic medicinal product been assessed and approved previously?",
+      "identifier": "feeType",
+      "answer": ["NRBoth", ""],
+      "number": 15
+    }
+  ]
+}

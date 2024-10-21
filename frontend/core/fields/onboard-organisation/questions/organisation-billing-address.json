@@ -1,0 +1,34 @@
+[
+  {
+    "sectionName": "Onboard an organisation",
+    "identifier": "organisation-billing-address",
+    "question": "Is your organisation's billing address the same as your organisation's registered address?",
+    "fields": [
+      {
+        "identifier": "organisation-billing-address-radios",
+        "type": "radio",
+        "validations": [
+          {
+            "required": "Select yes if your organisation's billing address is the same as your organisation's registered address"
+          }
+        ],
+        "answers": [
+          {
+            "value": "Yes",
+            "route": "organisation-primary-billing-contact"
+          },
+          {
+            "value": "No",
+            "route": "organisation-separate-billing-address"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          "Select Continue to add your primary billing contact."
+        ]
+      }
+    ]
+  }
+]

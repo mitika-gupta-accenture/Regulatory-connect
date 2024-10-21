@@ -1,0 +1,34 @@
+    "route": [
+      {
+        "review-and-submit": 
+          {
+            "or":[
+                     {
+                    "equals" : {
+                      "application-relation-radios": "Homeopathic national rules (NR)"
+                    },
+                    "and": [ 
+                        {
+                        "or" : [
+                            {
+                                "equals": {
+                                    "application-relation-radios": "Traditional herbal registration (THR)"
+                                }
+                            }, 
+                            {
+                                "equals": {
+                                    "application-relation-radios": "Simplified homeopathic registration (HR)"
+                                }
+                            }
+                        ],
+                        "equals": {
+                            "territory-radios": "United Kingdom"
+                        }
+                    }
+                    ]
+                }
+            ]
+          }
+      }
+    ]
+  }

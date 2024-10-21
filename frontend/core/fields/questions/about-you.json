@@ -1,0 +1,105 @@
+[
+  {
+    "sectionName": "About you",
+    "identifier": "are-you-willing-to-be-contacted",
+    "question": "Can we contact you about your report?",
+    "fields": [
+      {
+        "type": "paragraph",
+        "content": [
+          "We will only contact you to confirm that we have received your report and, if we need to, ask another question about the report."
+        ]
+      },
+      {
+        "identifier": "are-you-willing-to-be-contacted-radios",
+        "type": "radio",
+        "validations": [
+          {
+            "required": "Confirm if we can contact you"
+          }
+        ],
+        "answers": [
+          {
+            "value": "Yes",
+            "route": "what-are-your-contact-details"
+          },
+          {
+            "value": "No",
+            "route": "review-and-submit"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "sectionName": "About you",
+    "identifier": "what-are-your-contact-details",
+    "question": "What are your contact details?",
+    "fields": [
+      {
+        "identifier": "your-name",
+        "type": "text",
+        "validations": [
+          {
+            "required": "Enter your name"
+          }
+        ],
+        "label": "Full name"
+      },
+      {
+        "type": "paragraph",
+        "content": ["How would you like to be contacted?"]
+      },
+      {
+        "identifier": "what-are-your-contact-details-checkboxes",
+        "type": "checkbox",
+        "validations": [
+          {
+            "required": "Choose how you want us to contact you"
+          }
+        ],
+        "answers": [
+          {
+            "value": "Email",
+            "fields": [
+              {
+                "identifier": "email-address",
+                "type": "text",
+                "label": "Enter address",
+                "validations": [
+                  {
+                    "required": "Enter your email address"
+                  },
+                  { "email": "Enter an email address in the correct format" }
+                ],
+                "exampleAnswer": "An email address we can contact you, e.g. 'name@example.com'",
+                "errorMessage": "Enter an email address in the correct format",
+                "size": 20
+              }
+            ]
+          },
+          {
+            "value": "Telephone",
+            "fields": [
+              {
+                "identifier": "telephone-number",
+                "type": "text",
+                "label": "Telephone number",
+                "validations": [
+                  {
+                    "required": "Enter your telephone number"
+                  },
+                  { "phone": "Enter a telephone number in the correct format" }
+                ],
+                "exampleAnswer": "For international numbers include the country code, e.g '+39'",
+                "errorMessage": "Enter a telephoen number in the correct format",
+                "size": 20
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "route": "review-and-submit"
+  }
+]

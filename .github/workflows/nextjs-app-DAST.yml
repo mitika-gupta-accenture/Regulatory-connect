@@ -1,0 +1,73 @@
+name: DAST-Scan
+
+on:
+  workflow_call:
+    inputs:
+      APP_URL:
+        required: true
+        type: string
+      environment:
+        required: true
+        type: string
+      artifact_destination:
+        required: true
+        type: string
+      nexus_artifact_group_id:
+        required: false
+        type: string
+      nexus_artifact_id:
+        required: false
+        type: string
+    outputs:
+      jobstatus: 
+        description: "Job status"
+        value: ${{ jobs.OWASP-DAST-Scan.outputs.jobstatus}}
+jobs:
+  OWASP-DAST-Scan:
+    env:
+      # nexus_artifact_repository: Regulatory-connect
+      nexus_artifact_repository: releases
+      nexus_server: https://devops-platform.mhra.gov.uk/nexus
+    outputs:
+      jobstatus: ${{ job.status }}  
+    runs-on: gp-prod-runner-set
+    steps:
+      - name: "OWASP ZAP Baseline Scan"
+        id: owaspzap
+        run: |
+          mkdir -p zap
+          docker run -v ./zap:/zap/wrk/:rw --name zap_nextjs --network=host -e ZAP_AUTH_HEADER -e ZAP_AUTH_HEADER_VALUE -e ZAP_AUTH_HEADER_SITE -u 0 -t ghcr.io/zaproxy/zaproxy:stable zap-baseline.py -t ${{ inputs.APP_URL }} -d -r report_html.html || true
+          docker cp zap_nextjs:/zap/wrk/report_html.html ./zap/report_html.html
+          
+      - name: "Upload HTML report"
+        if: ${{ steps.owaspzap.outcome == 'success' && inputs.artifact_destination == 'Github' }}
+        uses: actions/upload-artifact@v4.3.1
+        with:
+          name: owasp-zap-report-${{ inputs.environment }}
+          path: ./zap/report_html.html
+          retention-days: 7
+
+      - name: Publish to Nexus
+        if: ${{ steps.owaspzap.outcome == 'success' && inputs.artifact_destination == 'Nexus' }}
+        run: |
+          echo "---------------------------------------------------------"
+          echo "Nexus Artifact Name: ${{ inputs.nexus_artifact_id }}"
+          echo "Package Path: ./zap/report_html.html"
+          echo "Version: ${{ github.run_number }}"
+          echo "Artifact Repository: ${{ env.nexus_artifact_repository }}"
+          echo "Group Id: ${{ inputs.nexus_artifact_group_id }}-${{ inputs.environment }}.DAST"
+          echo "---------------------------------------------------------"
+          
+          mvn -D"file=./zap/report_html.html" \
+          -D"repositoryId=${{ env.nexus_artifact_repository }}" \
+          -D"groupId=${{ inputs.nexus_artifact_group_id }}-${{ inputs.environment }}" \
+          -D"url=${{ env.nexus_server }}/repository/${{ env.nexus_artifact_repository }}" \
+          -D"packaging=html" \
+          -D"artifactId=${{ inputs.nexus_artifact_id }}" \
+          -D"version=${{ github.run_number }}" \
+          -D"repositoryLayout=default" \
+          deploy:deploy-file -B
+
+      - name: "Delete zap scan's container"
+        if: always()
+        run: docker rm zap_nextjs

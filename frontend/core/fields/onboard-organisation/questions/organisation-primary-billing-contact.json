@@ -1,0 +1,48 @@
+[
+  {
+    "sectionName": "Onboard an organisation",
+    "identifier": "organisation-primary-billing-contact",
+    "question": "Add primary billing contact?",
+    "route": "organisation-primary-invoice-contact",
+    "fields": [
+      {
+        "type": "paragraph",
+        "content": [
+          "This is the primary billing contact email address for all MHRA account-related matters about your organisation."
+        ]
+      },
+      {
+        "identifier": "organisation-primary-billing-contact-email-text",
+        "type": "text",
+        "label": "Email address",
+        "validations": [
+          {
+            "required": "You must enter a billing contact email address"
+          }
+        ],
+        "errorMessage": "Confirm the official email of your organisation",
+        "size": 40
+      },
+      {
+        "identifier": "organisation-authorised-to-communicate-email-text",
+        "type": "text",
+        "label": "Confirm email address",
+        "validations": [
+          {
+            "required": "You must confirm the billing contact email address",
+            "is-equal-to": "The given contact details must match"
+          }
+        ],
+        "isEqualTo": "organisation-primary-billing-contact-email-text",
+        "errorMessage": "Confirm the official email of your organisation",
+        "size": 40
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          "Select Continue to add your primary invoice email address."
+        ]
+      }
+    ]
+  }
+]

@@ -1,0 +1,110 @@
+[
+  {
+    "identifier": "select-application-type",
+    "sectionName": "Generate a licence number",
+    "question": "Select application type",
+    "apiGroupName": "GET_PL_NUMBER_GENERATION",
+    "buttonTwoText": "Cancel",
+    "showButtonGroupInline": true,
+    "fields": [
+      {
+        "identifier": "applicationTypeIdentifier",
+        "type": "radio",
+        "className": "govuk-!-width-three-quarters",
+        "validations": [
+          {
+            "required": "You must select an application type"
+          }
+        ],
+        "apiDataKey": "applicationType"
+      }
+    ],
+    "route": [
+      {
+        "select-the-territory": {
+          "notEquals": {
+            "applicationTypeIdentifier": "2"
+          }
+        }
+      },
+      {
+        "how-many-licence-numbers-do-you-require": "default"
+      }
+    ]
+  },
+  {
+    "identifier": "select-the-territory",
+    "question": "Select the territory",
+    "buttonTwoText": "Cancel",
+    "sectionName": "Generate a licence number",
+    "showButtonGroupInline": true,
+    "apiGroupName": "GET_PL_NUMBER_GENERATION",
+    "fields": [
+      {
+        "identifier": "territoryIdentifier",
+        "type": "radio",
+        "className": "govuk-!-width-three-quarters",
+        "validations": [
+          {
+            "required": "You must select the territory"
+          }
+        ],
+        "apiDataKey": "territory"
+      }
+    ],
+    "route": "how-many-licence-numbers-do-you-require"
+  },
+  {
+    "identifier": "how-many-licence-numbers-do-you-require",
+    "question": "How many licence numbers do you require?",
+    "buttonTwoText": "Cancel",
+    "sectionName": "Generate a licence number",
+    "showButtonGroupInline": true,
+    "fields": [
+      {
+        "identifier": "hint-type",
+        "type": "hint",
+        "text": "Must be between 1 and 50"
+      },
+      {
+        "identifier": "count",
+        "type": "text",
+        "min": 1,
+        "max": 50,
+        "defaultValue": 1,
+        "inputMode": "numeric",
+        "validations": [
+          {
+            "required": "You must enter a number between 1 and 50"
+          },
+          {
+            "min-max-input": "You must enter a number between 1 and 50"
+          }
+        ],
+        "errormessage": "please tell us",
+        "size": 2
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          "All numbers generated will be for the same company, application type\nand territory."
+        ]
+      }
+    ],
+    "route": "check-and-confirm-your-answers"
+  },
+  {
+    "identifier": "generation-successful",
+    "question": "",
+    "showSubmitButton": false,
+    "isCancelButtonRequired": false,
+    "fields": [
+      {
+        "type": "server-component",
+        "rule": "generationSuccessful",
+        "identifier": "generation-successful",
+        "useFor": "POST_PL_NUMBER_GENERATION"
+      }
+    ]
+  }
+]

@@ -1,0 +1,92 @@
+[
+    {
+      "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+      "value": "@Microsoft.KeyVault(SecretUri=https://kvrms01uatuks.vault.azure.net/secrets/APPINSIGHTS-INSTRUMENTATIONKEY/)",
+      "slotSetting": true
+    },
+    {
+      "name": "APPINSIGHTS_PROFILERFEATURE_VERSION",
+      "value": "1.0.0",
+      "slotSetting": true
+    },
+    {
+      "name": "APPINSIGHTS_SNAPSHOTFEATURE_VERSION",
+      "value": "1.0.0",
+      "slotSetting": true
+    },
+    {
+      "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
+      "value": "@Microsoft.KeyVault(SecretUri=https://kvrms01uatuks.vault.azure.net/secrets/APPLICATIONINSIGHTS-CONNECTION-STRING/)",
+      "slotSetting": false
+    },
+    {
+      "name": "ApplicationInsightsAgent_EXTENSION_VERSION",
+      "value": "~3",
+      "slotSetting": true
+    },
+    {
+      "name": "DiagnosticServices_EXTENSION_VERSION",
+      "value": "~3",
+      "slotSetting": true
+    },
+    {
+      "name": "ENABLE_ORYX_BUILD",
+      "value": "false",
+      "slotSetting": false
+    },
+    {
+      "name": "InstrumentationEngine_EXTENSION_VERSION",
+      "value": "disabled",
+      "slotSetting": true
+    },
+    {
+      "name": "NODE_ENV",
+      "value": "production",
+      "slotSetting": false
+    },
+    {
+      "name": "PORT",
+      "value": "3000",
+      "slotSetting": false
+    },
+    {
+      "name": "SCM_DO_BUILD_DURING_DEPLOYMENT",
+      "value": "false",
+      "slotSetting": false
+    },
+    {
+      "name": "SnapshotDebugger_EXTENSION_VERSION",
+      "value": "disabled",
+      "slotSetting": true
+    },
+    {
+      "name": "WEBSITE_HTTPLOGGING_RETENTION_DAYS",
+      "value": "2",
+      "slotSetting": false
+    },
+    {
+      "name": "WEBSITE_RUN_FROM_PACKAGE",
+      "value": "1",
+      "slotSetting": false
+    },
+    {
+      "name": "WEBSITE_WEBDEPLOY_USE_SCM",
+      "value": "false",
+      "slotSetting": false
+    },
+    {
+      "name": "XDT_MicrosoftApplicationInsights_BaseExtensions",
+      "value": "disabled",
+      "slotSetting": true
+    },
+    {
+      "name": "XDT_MicrosoftApplicationInsights_Mode",
+      "value": "recommended",
+      "slotSetting": true
+    },
+    {
+      "name": "XDT_MicrosoftApplicationInsights_PreemptSdk",
+      "value": "disabled",
+      "slotSetting": true
+    }
+  ]

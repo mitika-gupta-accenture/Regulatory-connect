@@ -1,0 +1,48 @@
+[
+  {
+    "sectionName": "Onboard an organisation",
+    "identifier": "organisation-primary-invoice-contact",
+    "question": "Add primary invoice contact?",
+    "route": "check-and-confirm-your-answers",
+    "fields": [
+      {
+        "type": "paragraph",
+        "content": [
+          "This is the primary invoice contact email address for all MHRA account-related matters about your organisation."
+        ]
+      },
+      {
+        "identifier": "organisation-primary-invoice-contact-email-text",
+        "type": "text",
+        "label": "Email address",
+        "validations": [
+          {
+            "required": "You must enter an invoice contact email address"
+          }
+        ],
+        "errorMessage": "Confirm the official email of your organisation",
+        "size": 40
+      },
+      {
+        "identifier": "organisation-authorised-to-communicate-email-text",
+        "type": "text",
+        "label": "Confirm email address",
+        "validations": [
+          {
+            "required": "You must confirm the invoice contact email address",
+            "is-equal-to": "The given contact details must match"
+          }
+        ],
+        "isEqualTo": "organisation-primary-invoice-contact-email-text",
+        "errorMessage": "Confirm the official email of your organisation",
+        "size": 40
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          "Select Continue to upload documents to support your request."
+        ]
+      }
+    ]
+  }
+]

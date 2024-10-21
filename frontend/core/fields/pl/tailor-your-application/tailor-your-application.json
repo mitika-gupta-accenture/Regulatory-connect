@@ -1,0 +1,1358 @@
+[
+  {
+    "sectionName": "",
+    "identifier": "before-you-start",
+    "isCancelButtonRequired": false,
+    "question": "Before you start",
+    "route": "what-type-of-application-are-you-making",
+    "fields": [
+      {
+        "identifier": "submit-application-paragraph-content",
+        "type": "paragraph",
+        "content": [
+          "You will need to submit a seperate application for each strength or pharmaceutical form or presentation of the product."
+        ]
+      },
+      {
+        "identifier": "section-tailor-heading-content",
+        "type": "heading",
+        "size": "m",
+        "text": ["Section 1: Tailor your application"]
+      },
+      {
+        "identifier": "second-paragraph-content",
+        "type": "paragraph",
+        "content": [
+          "The first section is called Tailor your application and comprises 6 to 10 questions. These questions govern how many other sections of the remaining application form you see."
+        ]
+      }
+    ]
+  },
+  {
+    "sectionName": "Tailor your application",
+    "identifier": "what-type-of-application-are-you-making",
+    "question": "What type of application are you making?",
+    "apiGroupName": "GET_PL_PRODUCT_CLASS_TYPES",
+    "fields": [
+      {
+        "identifier": "application-relation-radios",
+        "type": "radio",
+        "hint": "Select one.",
+        "apiDataKey": "productClassTypes",
+        "validations": [
+          {
+            "required": "You must select what type of an application you are making."
+          }
+        ],
+        "answers": [
+          {
+            "value": "1",
+            "route": "select-biological-substance-applies",
+            "fields": [
+              {
+                "identifier": "biological-type-checkboxes",
+                "type": "checkbox",
+                "apiDataKey": "productClassTypes",
+                "hint": "Select all that apply.",
+                "errorMessage": "Please select an option",
+                "size": 20
+              }
+            ]
+          },
+          {
+            "value": "2",
+            "route": "legal-status-change-apply-confirmation"
+          },
+          {
+            "value": "3",
+            "route": [
+              {
+                "confirm-contact-address-marketing-authorisation-holder": {
+                  "greaterThen": {
+                    "organisationDetails": 1
+                  }
+                }
+              },
+              {
+                "check-proposed-marketing-authorisation-holder-details": "default"
+              }
+            ]
+          },
+          {
+            "value": "4",
+            "route": [
+              {
+                "confirm-contact-address-marketing-authorisation-holder": {
+                  "greaterThen": {
+                    "organisationDetails": 1
+                  }
+                }
+              },
+              {
+                "check-proposed-marketing-authorisation-holder-details": "default"
+              }
+            ]
+          },
+          {
+            "value": "5",
+            "route": [
+              {
+                "confirm-contact-address-marketing-authorisation-holder": {
+                  "greaterThen": {
+                    "organisationDetails": 1
+                  }
+                }
+              },
+              {
+                "check-proposed-marketing-authorisation-holder-details": "default"
+              }
+            ]
+          },
+          {
+            "value": "6",
+            "route": [
+              {
+                "confirm-contact-address-marketing-authorisation-holder": {
+                  "greaterThen": {
+                    "organisationDetails": 1
+                  }
+                }
+              },
+              {
+                "check-proposed-marketing-authorisation-holder-details": "default"
+              }
+            ]
+          },
+          {
+            "value": "7",
+            "route": "herbal-product-ingredients",
+            "fields": [
+              {
+                "identifier": "thr-radios",
+                "type": "radio",
+                "hint": "Specify the form you medicinal product is presented in",
+                "errorMessage": "Please select an option",
+                "apiDataKey": "productClassTypes",
+                "route": "herbal-product-ingredients",
+                "validations": [
+                  {
+                    "required": "Please select at least one option"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "sectionName": "Tailor your application",
+    "identifier": "legal-status-change-apply-confirmation",
+    "question": "Are you applying for a change of legal status?",
+    "fields": [
+      {
+        "identifier": "change-of-legal-status-radios",
+        "type": "radio",
+        "validations": [
+          {
+            "required": "Please select an option"
+          }
+        ],
+        "answers": [
+          {
+            "value": "Yes",
+            "route": "how-legal-status-changed"
+          },
+          {
+            "value": "No",
+            "route": [
+              {
+                "confirm-contact-address-marketing-authorisation-holder": {
+                  "greaterThen": {
+                    "organisationDetails": 1
+                  }
+                }
+              },
+              {
+                "check-proposed-marketing-authorisation-holder-details": "default"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "sectionName": "Tailor your application",
+    "identifier": "how-legal-status-changed",
+    "question": "How has the legal status changed?",
+    "apiGroupName": "GET_PL_TYA_RECLASSIFICATION",
+    "fields": [
+      {
+        "identifier": "how-has-legal-status-changed-radios",
+        "hint": "Select one.",
+        "type": "radio",
+        "apiDataKey": "reclassificationStatus",
+        "validations": [
+          {
+            "required": "Please select an option"
+          }
+        ],
+        "answers": [
+          {
+            "value": "1"
+          },
+          {
+            "value": "2"
+          },
+          {
+            "value": "3",
+            "fields": [
+              {
+                "identifier": "legal-status-change-text",
+                "type": "text",
+                "validations": [
+                  {
+                    "required": "Please tell us about the legal status change"
+                  }
+                ],
+                "label": "Enter the legal status change",
+                "errormessage": "please tell us",
+                "size": 50
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "route": [
+      {
+        "confirm-contact-address-marketing-authorisation-holder": {
+          "greaterThen": {
+            "organisationDetails": 1
+          }
+        }
+      },
+      {
+        "check-proposed-marketing-authorisation-holder-details": "default"
+      }
+    ]
+  },
+  {
+    "sectionName": "Tailor your application",
+    "identifier": "herbal-product-ingredients",
+    "question": "What does your herbal product contain? (optional)",
+    "fields": [
+      {
+        "identifier": "change-of-legal-status-radios",
+        "type": "checkbox",
+        "answers": [
+          {
+            "value": "Contains ancillary vitamins/minerals covered with a CEP"
+          },
+          {
+            "value": "Contains ancillary vitamins/minerals not covered with a CEP"
+          },
+          {
+            "value": "Contains new excipients"
+          },
+          {
+            "value": "Contains new sources tse risk excipients (non-CEP)"
+          },
+          {
+            "value": "Is a sterile product"
+          }
+        ]
+      }
+    ],
+    "route": [
+      {
+        "confirm-contact-address-marketing-authorisation-holder": {
+          "greaterThen": {
+            "organisationDetails": 1
+          }
+        }
+      },
+      {
+        "check-proposed-marketing-authorisation-holder-details": "default"
+      }
+    ]
+  },
+  {
+    "sectionName": "Tailor your application",
+    "identifier": "select-biological-substance-applies",
+    "question": "Select which biological substance applies (optional)",
+    "fields": [
+      {
+        "identifier": "change-of-legal-status-radios",
+        "type": "checkbox",
+        "answers": [
+          {
+            "value": "Biosimilar"
+          },
+          {
+            "value": "Biologic conjugated to a chemical entity"
+          },
+          {
+            "value": "Product manufactured at the point of care"
+          },
+          {
+            "value": "Vaccine adjuvanted"
+          }
+        ]
+      }
+    ],
+    "route": [
+      {
+        "confirm-contact-address-marketing-authorisation-holder": {
+          "greaterThen": {
+            "organisationDetails": 1
+          }
+        }
+      },
+      {
+        "check-proposed-marketing-authorisation-holder-details": "default"
+      }
+    ]
+  },
+  {
+    "sectionName": "Tailor your application",
+    "identifier": "check-proposed-marketing-authorisation-holder-details",
+    "question": "Check your proposed marketing authorisation holder (MAH) details",
+    "fields": [
+      {
+        "identifier": "marketing-authorisation-holder",
+        "apiDataKey": "organisationDetails",
+        "type": "summaryList",
+        "fields": [
+          {
+            "name": {
+              "identifier": "marketing-authorisation-holder-organisation",
+              "type": "plainText",
+              "content": "Organisation"
+            },
+            "values": [
+              {
+                "identifier": "marketing-authorisation-holder-name",
+                "type": "plainText",
+                "apiDataKey": "organisationDetails.0.name",
+                "content": "###{}"
+              }
+            ]
+          },
+          {
+            "name": {
+              "identifier": "marketing-authorisation-holder-address",
+              "type": "plainText",
+              "apiDataKey": "organisationDetails.0.content",
+              "content": "Address"
+            },
+            "values": [
+              {
+                "identifier": "marketing-authorisation-holder-addressline1",
+                "type": "plainText",
+                "apiDataKey": "organisationDetails.0.addressLine1",
+                "content": "###{}"
+              },
+              {
+                "identifier": "marketing-authorisation-holder-city",
+                "type": "plainText",
+                "apiDataKey": "organisationDetails.0.city",
+                "content": "###{}"
+              },
+              {
+                "identifier": "marketing-authorisation-holder-postal-code",
+                "type": "plainText",
+                "apiDataKey": "organisationDetails.0.postalcode",
+                "content": "###{}"
+              },
+              {
+                "identifier": "marketing-authorisation-holder-country",
+                "type": "plainText",
+                "apiDataKey": "organisationDetails.0.country",
+                "content": "###{}"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "route": "apply-using-trading-name-organisation"
+  },
+  {
+    "sectionName": "Tailor your application",
+    "identifier": "confirm-contact-address-marketing-authorisation-holder",
+    "question": "Confirm the contact address for the marketing authorisation holder (MAH)",
+    "fields": [
+      {
+        "type": "server-component",
+        "rule": "organisation-address",
+        "identifier": "marketing-authorisation-holder",
+        "fields": [
+          {
+            "identifier": "marketing-authorisation-holder",
+            "apiDataKey": "organisationDetails",
+            "type": "radio",
+            "hint": "Select one.",
+            "validations": [
+              {
+                "required": "Please select an option"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "details",
+        "heading": "The MAH is missing or incorrect",
+        "fields": [
+          {
+            "type": "paragraph",
+            "content": [
+              "If you cannot find the mah or it's incorrect, you will need to [request this to be added](/). Once added, you can come back and select it to continue with this section",
+              "MHRA's reference data team will aim to deal with your requests within 2 working days"
+            ]
+          }
+        ]
+      }
+    ],
+    "route": "apply-using-trading-name-organisation"
+  },
+  {
+    "sectionName": "Tailor your application",
+    "identifier": "apply-using-trading-name-organisation",
+    "question": "Do you want to apply using a trading name for your organisation?",
+    "fields": [
+      {
+        "identifier": "apply-using-trading-name-organisation-radios",
+        "type": "radio",
+        "validations": [
+          {
+            "required": "Please select an option"
+          }
+        ],
+        "answers": [
+          {
+            "value": "Yes",
+            "route": "territory-product-sold-confirmation",
+            "fields": [
+              {
+                "identifier": "apply-tradhing-name-for-your-organisation",
+                "type": "select",
+                "label": "Trading Name",
+                "apiDataKey": "tradingName",
+                "placeHolder": "Select a name",
+                "validations": [
+                  {
+                    "required": "Please select an option"
+                  }
+                ],
+                "required": true
+              },
+              {
+                "type": "details",
+                "heading": "The trading name is missing",
+                "fields": [
+                  {
+                    "type": "paragraph",
+                    "content": [
+                      "If you cannot find the trading name, you will need to [request this to be added](/). Once added, you can come back and select it to continue with this section.",
+                      "MHRA's reference data team will aim to deal with your request within 2 working days."
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "value": "No",
+            "route": "territory-product-sold-confirmation"
+          }
+        ]
+      }
+    ],
+    "route": "territory-product-sold-confirmation"
+  },
+  {
+    "sectionName": "Tailor your application",
+    "identifier": "territory-product-sold-confirmation",
+    "question": "In which territory will your product be sold?",
+    "apiGroupName": "GET_PL_TYA_TERRITORY",
+    "fields": [
+      {
+        "identifier": "territory-radios",
+        "hint": "Select one.",
+        "type": "radio",
+        "validations": [
+          {
+            "required": "please select an option"
+          }
+        ],
+        "apiDataKey": "territory",
+        "answers": [
+          {
+            "value": "251",
+            "route": "you-cannot-use-this-service",
+            "fields": [
+              {
+                "identifier": "uk-mandatory-scope-radios",
+                "type": "radio",
+                "validations": [
+                  {
+                    "required": "Select yes if the application falls under the mandatory scope of community procedures"
+                  }
+                ],
+                "answers": [
+                  {
+                    "value": "Yes",
+                    "route": "you-cannot-use-this-service"
+                  },
+                  {
+                    "value": "No",
+                    "route": [
+                      {
+                        "select-windsor-framework-category-that-applies-to-your-product": {
+                          "and": [
+                            {
+                              "notEquals": {
+                                "application-relation-radios": "Simplified Homeopathic Registration (HR)"
+                              }
+                            },
+                            {
+                              "notEquals": {
+                                "application-relation-radios": "Traditional Herbal Registration (THR)"
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "what-is-your-licence-number": "default"
+                      }
+                    ]
+                  }
+                ],
+                "label": "Does this application fall under the mandatory scope of community procedures (centralised procedures)",
+                "errorMessage": "Select yes if the application falls under the mandatory scope of community procedures",
+                "size": 50
+              }
+            ]
+          },
+          {
+            "value": "249",
+            "route": [
+              {
+                "select-windsor-framework-category-that-applies-to-your-product": {
+                  "and": [
+                    {
+                      "notEquals": {
+                        "application-relation-radios": "Simplified Homeopathic Registration (HR)"
+                      }
+                    },
+                    {
+                      "notEquals": {
+                        "application-relation-radios": "Traditional Herbal Registration (THR)"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "what-is-your-licence-number": "default"
+              }
+            ]
+          },
+          {
+            "value": "247",
+            "fields": [
+              {
+                "identifier": "ni-mandatory-scope-radios",
+                "type": "radio",
+                "validations": [
+                  {
+                    "required": "Select yes if the application falls under the mandatory scope of community procedures"
+                  }
+                ],
+                "answers": [
+                  {
+                    "value": "Yes",
+                    "route": "you-cannot-use-this-service"
+                  },
+                  {
+                    "value": "No",
+                    "route": [
+                      {
+                        "select-windsor-framework-category-that-applies-to-your-product": {
+                          "and": [
+                            {
+                              "notEquals": {
+                                "application-relation-radios": "Simplified Homeopathic Registration (HR)"
+                              }
+                            },
+                            {
+                              "notEquals": {
+                                "application-relation-radios": "Traditional Herbal Registration (THR)"
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "what-is-your-licence-number": "default"
+                      }
+                    ]
+                  }
+                ],
+                "label": "Does this application fall under the mandatory scope of community procedures (centralised procedures)",
+                "errorMessage": "please tell us",
+                "size": 50
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "sectionName": "Tailor your application",
+    "identifier": "what-is-your-licence-number",
+    "question": "What is your license number?",
+    "fields": [
+      {
+        "type": "autocomplete",
+        "widthSize": "20",
+        "validations": [
+          {
+            "required": "Please select an option"
+          }
+        ],
+        "apiDataKey": "productclass",
+        "placeHolder": "Start typing",
+        "required": true
+      },
+      {
+        "type": "details",
+        "heading": "The license number is missing",
+        "fields": [
+          {
+            "type": "paragraph",
+            "content": [
+              "Please check the following:",
+              "- the license numbers you have entered are correct.",
+              "- the correct prefix of your license has been requested, or that you have requested a license number.",
+              "- you have [generated a new license number (opens in new tab)](/) .",
+              "If you still can't find the license number, email MHRA customer services at [info@mhra.gov.uk](/)"
+            ]
+          }
+        ]
+      }
+    ],
+    "route": "which-procedure-type-does-your-application-relate-to"
+  },
+  {
+    "sectionName": "Tailor your application",
+    "identifier": "procedure-type",
+    "question": "Which procedure type does your application relate to?",
+    "fields": [
+      {
+        "type": "server-component",
+        "identifier": "which-procedure-type-radios",
+        "rule": "procedure-type-radios",
+        "fields": [
+          {
+            "type": "radio",
+            "identifier": "which-procedure-type-radios",
+            "hint": "Select one.",
+            "answers": [
+              {
+                "value": "National Procedure",
+                "route": "check-and-confirm-your-answers"
+              },
+              {
+                "value": "National procedure - Access Partners",
+                "route": "who-are-your-access-partners"
+              },
+              {
+                "value": "National procedure - Project Orbis",
+                "route": "who-are-your-orbis-partners"
+              },
+              {
+                "value": "Unfettered Access Procedure (UAP)",
+                "route": "what-is-your-plni-number-for-your-northern-ireland-marketing-authorisation"
+              },
+              {
+                "value": "A mutual recognition procedure (according to article 28(2) of Directive 2001/83/EC)",
+                "route": "what-is-your-plni-number-for-your-northern-ireland-marketing-authorisation"
+              },
+              {
+                "value": "A decentralised procedure (according to article 28(3) of Directives 2001/83/EC)",
+                "route": "what-is-your-plni-number-for-your-northern-ireland-marketing-authorisation"
+              },
+              {
+                "value": "International Recognition Procedure (IRP)",
+                "route": "reference-regulator-confirmation",
+                "fields": [
+                  {
+                    "identifier": "procedure-type-thr-sub-option-radio",
+                    "type": "radio",
+                    "validations": [
+                      {
+                        "required": "You must select a route"
+                      }
+                    ],
+                    "answers": [
+                      {
+                        "value": "International recognition route A"
+                      },
+                      {
+                        "value": "International recognition route B"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "sectionName": "Tailor your application",
+    "identifier": "which-procedure-type-does-your-application-relate-to",
+    "question": "Which procedure type does your application relate to?",
+    "fields": [
+      {
+        "type": "radio",
+        "identifier": "which-procedure-type-radios",
+        "hint": "Select one.",
+        "answers": [
+          {
+            "value": "National Procedure",
+            "route": "check-and-confirm-your-answers"
+          },
+          {
+            "value": "National procedure - Access Partners",
+            "route": "who-are-your-access-partners"
+          },
+          {
+            "value": "National procedure - Project Orbis",
+            "route": "who-are-your-orbis-partners"
+          },
+          {
+            "value": "Unfettered Access Procedure (UAP)",
+            "route": "what-is-your-plni-number-for-your-northern-ireland-marketing-authorisation"
+          },
+          {
+            "value": "International Recognition Procedure (IRP)",
+            "route": "reference-regulator-confirmation"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "sectionName": "Tailor your application",
+    "identifier": "who-are-your-access-partners",
+    "question": "Who are your Access partners?",
+    "fields": [
+      {
+        "type": "checkbox",
+        "identifier": "access-partners-checkboxes",
+        "apiDataKey": "accessPartner",
+        "hint": "Select all that apply.",
+        "validations": [
+          {
+            "required": "You must select at least one Access partner."
+          }
+        ]
+      }
+    ],
+    "route": "check-and-confirm-your-answers"
+  },
+  {
+    "sectionName": "Tailor your application",
+    "identifier": "who-are-your-orbis-partners",
+    "question": "Who are your Orbis partners?",
+    "fields": [
+      {
+        "type": "checkbox",
+        "identifier": "orbis-partners-checkboxes",
+        "apiDataKey": "orbisPartner",
+        "hint": "Select all that apply.",
+        "validations": [
+          {
+            "required": "You must select at least one Orbis partner."
+          }
+        ]
+      }
+    ],
+    "route": "check-and-confirm-your-answers"
+  },
+  {
+    "sectionName": "Tailor your application",
+    "identifier": "what-is-your-plni-number-for-your-northern-ireland-marketing-authorisation",
+    "question": "What is your plni number for you Northern Ireland marketing authorisation?",
+    "fields": [
+      {
+        "identifier": "plni-add-another",
+        "type": "server-component",
+        "rule": "add-another",
+        "fields": [
+          {
+            "identifier": "plni-number-input",
+            "type": "text",
+            "addMoreButtonText": "Add another authorisation number",
+            "addMoreButtonType": "secondary",
+            "validations": [
+              {
+                "required": "Enter an authorisation number"
+              }
+            ],
+            "label": "Enter authorisation number",
+            "errorMessage": "please enter an authorisation number",
+            "size": 20
+          }
+        ]
+      }
+    ],
+    "route": "confirm-following-statements"
+  },
+  {
+    "sectionName": "Tailor your application",
+    "identifier": "confirm-following-statements",
+    "question": "Please read and confirm the following statements:",
+    "fields": [
+      {
+        "type": "unorderedlist",
+        "listStyle": "bullet",
+        "fields": [
+          {
+            "type": "paragraph",
+            "content": [
+              "The gb application conforms with the dossier approved for marketing in Northern Ireland (NI), including approved variations."
+            ]
+          },
+          {
+            "type": "paragraph",
+            "content": [
+              "All iterations of the chmp/rms/ni assessment reports and end of procedure documents will be provided in the submission.}"
+            ]
+          },
+          {
+            "type": "paragraph",
+            "content": [
+              "The proposed product information is identical to that approved in the ni ma and that the produt information, in microsoft word format will be included with the submission."
+            ]
+          },
+          {
+            "type": "paragraph",
+            "content": [
+              "The proposed risk management plan (rmp) is identical to the rmp in northern ireland and/or the european union."
+            ]
+          }
+        ]
+      },
+      {
+        "type": "radio",
+        "identifier": "confirm-following-statements-radio",
+        "label": "Do you confirm the above statements are true?",
+        "validations": [
+          {
+            "required": "select an option"
+          }
+        ],
+        "errormessage": "please enter an authorisation number",
+        "answers": [
+          {
+            "value": "Yes",
+            "route": "licence-conditions-marketing-authorisation-confirmation"
+          },
+          {
+            "value": "No",
+            "route": "you-cannot-use-this-service"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "sectionName": "Tailor your application",
+    "identifier": "licence-conditions-marketing-authorisation-confirmation",
+    "question": "Are there any licence conditions associated with your marketing authorisation?",
+    "fields": [
+      {
+        "type": "radio",
+        "identifier": "licence-conditions-marketing-authorisation-confirmation-radios",
+        "validations": [
+          {
+            "required": "select an option"
+          }
+        ],
+        "answers": [
+          {
+            "value": "Yes",
+            "route": "what-license-conditions-are-associated-with-marketing-authorisation"
+          },
+          {
+            "value": "No",
+            "route": "check-and-confirm-your-answers"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "sectionName": "Tailor your application",
+    "identifier": "what-license-conditions-are-associated-with-marketing-authorisation",
+    "question": "What licence conditions are associated with your marketing authorisation?",
+    "fields": [
+      {
+        "identifier": "licence-conditions-marketing-authorisation-confirmation",
+        "type": "server-component",
+        "rule": "add-another",
+        "fields": [
+          {
+            "identifier": "licence-conditions-marketing-authorisation-confirmation-text",
+            "type": "text-area",
+            "validations": [
+              {
+                "required": "Please Provide details about the licence conditions"
+              }
+            ],
+            "label": "please provide more information about the licence condition",
+            "errorMessage": "Provide more detail",
+            "size": 20
+          }
+        ]
+      },
+      {
+        "type": "textarea",
+        "label": "License condition",
+        "identifier": "licence-conditions-marketing-authorisation-confirmation-text",
+        "validations": [
+          {
+            "required": "Please provide details about the licence conditions"
+          }
+        ]
+      }
+    ],
+    "route": "check-and-confirm-your-answers"
+  },
+  {
+    "sectionName": "Tailor your application",
+    "identifier": "reference-regulator-confirmation",
+    "route": "relevant-procedure-number-international-maa-confirmation",
+    "question": "Who is the reference regulator?",
+    "fields": [
+      {
+        "type": "radio",
+        "hint": "Select one.",
+        "apiDataKey": "referenceRegulator",
+        "identifier": "reference-regulator-radios",
+        "validations": [
+          {
+            "required": "You must select who the reference regulator is."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "sectionName": "Tailor your application",
+    "identifier": "relevant-procedure-number-international-maa-confirmation",
+    "question": "Do you have a relevant procedure number for your International MAA?",
+    "fields": [
+      {
+        "type": "radio",
+        "label": "Select one.",
+        "identifier": "reference-regulator-radios",
+        "validations": [
+          {
+            "required": "select an option"
+          }
+        ],
+        "answers": [
+          {
+            "value": "Yes",
+            "route": "proposed-mah-same-company-legal-group-confirmation",
+            "fields": [
+              {
+                "type": "text",
+                "identifier": "relevant-procedure-number-international-maa-confirmation",
+                "label": "Enter the procedure number",
+                "validations": [
+                  {
+                    "required": "Enter the procedure number"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "value": "No",
+            "route": "proposed-mah-same-company-legal-group-confirmation"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "sectionName": "Tailor your application",
+    "identifier": "proposed-mah-same-company-legal-group-confirmation",
+    "question": "Is the proposed MAH the same company, or part of the same legal group of companies, stated in the international procedure?",
+    "fields": [
+      {
+        "type": "radio",
+        "identifier": "mah-same-company-radios",
+        "validations": [
+          {
+            "required": "select an option"
+          }
+        ],
+        "answers": [
+          {
+            "value": "Yes",
+            "route": "confirmation-of-statements"
+          },
+          {
+            "value": "No",
+            "route": "international-marketing-application-holder"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "sectionName": "Tailor your application",
+    "identifier": "international-marketing-application-holder",
+    "question": "Who is your international marketing application holder?",
+    "fields": [
+      {
+        "type": "text",
+        "identifer": "different-mah",
+        "label": "Enter the name of your marketing authorisation holder (MAH) in the international procedure",
+        "validations": [
+          {
+            "required": "Enter a marketing authorisation holder"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": ["Read and confirm the following statements:"]
+      },
+      {
+        "type": "unorderedlist",
+        "listStyle": "bullet",
+        "listItems": [
+          {
+            "text": "The MAH declares they will fulfil all their legal obligations as a holder of a marketing authorisation, such as the obligations stated in the Regulations 74 and 75 of the Human Medicines Regulations 2012, as amended."
+          },
+          {
+            "text": "The MAH confirms that all legal obligations can be met at submission, during the assessment process and throughout the life of the marketing authorisation."
+          }
+        ]
+      },
+      {
+        "type": "radio",
+        "identifier": "mah-same-company-radios",
+        "label": "Do you confirm that the above statements are true?",
+        "validations": [
+          {
+            "required": "select an option"
+          }
+        ],
+        "answers": [
+          {
+            "value": "Yes",
+            "route": "confirmation-of-statements"
+          },
+          {
+            "value": "No",
+            "route": "you-cannot-use-this-service"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "sectionName": "Tailor your application",
+    "identifier": "confirmation-of-statements",
+    "question": "Read and confirm the following statements:",
+    "fields": [
+      {
+        "type": "unorderedlist",
+        "listStyle": "bullet",
+        "listItems": [
+          {
+            "text": "All available iterations of the reference regulator assessment reports and end of procedure documents will be provided with the submission."
+          },
+          {
+            "text": "If applicable the ASMF holder has submitted Applicant's and Restricted parts of the ASMF, including approved variations and all iterations of the assessment reports on the Applicant's and Restricted parts."
+          }
+        ]
+      },
+      {
+        "type": "radio",
+        "identifier": "irp-confirm-statement-radios",
+        "label": "Do you confirm that the above statements are true?",
+        "validations": [
+          {
+            "required": "select an option"
+          }
+        ],
+        "answers": [
+          {
+            "value": "Yes",
+            "route": "select-reference-regulator-approval-type"
+          },
+          {
+            "value": "No",
+            "route": "you-cannot-use-this-service"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "sectionName": "Tailor your application",
+    "identifier": "select-reference-regulator-approval-type",
+    "question": "Select the type of reference regulator approval",
+    "fields": [
+      {
+        "type": "radio",
+        "identifier": "reg-ref-approval-type-radio",
+        "validations": [
+          {
+            "required": "select an option"
+          }
+        ],
+        "answers": [
+          {
+            "value": "Full Approval",
+            "route": "licence-conditions-reference-regulator-approval"
+          },
+          {
+            "value": "Conditional approval or international equiavalent",
+            "route": "licence-conditions-reference-regulator-approval"
+          },
+          {
+            "value": "Exceptional circumstances approval or international equivalent",
+            "route": "licence-conditions-reference-regulator-approval"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "sectionName": "Tailor your application",
+    "identifier": "licence-conditions-reference-regulator-approval",
+    "question": "Are the any licence conditions associated with your reference regulator approval?",
+    "fields": [
+      {
+        "type": "radio",
+        "identifier": "reg-ref-approval-type-radio",
+        "validations": [
+          {
+            "required": "select an option"
+          }
+        ],
+        "answers": [
+          {
+            "value": "Yes",
+            "route": "tell-us-about-licence-conditions-associated-with-reference-regulator-approval"
+          },
+          {
+            "value": "No",
+            "route": "differences-therapeutic-indications-uk-reference-regulator"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "sectionName": "Tailor your application",
+    "identifier": "tell-us-about-licence-conditions-associated-with-reference-regulator-approval",
+    "question": "Tell us about the licence conditions associated with the reference regulator approval",
+    "fields": [
+      {
+        "type": "server-component",
+        "identifier": "irp-licence-conditions",
+        "rule": "add-another",
+        "fields": [
+          {
+            "type": "textarea",
+            "label": "License condition",
+            "identifier": "licence-conditions-marketing-authorisation-confirmation-rra-text",
+            "validations": [
+              {
+                "required": "Provide detail about the licence conditions"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "route": "differences-therapeutic-indications-uk-reference-regulator"
+  },
+  {
+    "sectionName": "Tailor your application",
+    "identifier": "differences-therapeutic-indications-uk-reference-regulator",
+    "question": "Are there any differences in the wording of proposed therapeutic indications for the UK and those approved by the reference regulator?",
+    "fields": [
+      {
+        "type": "radio",
+        "identifier": "differences-therapeutic-indications-uk-reference-regulator-radio",
+        "validations": [
+          {
+            "required": "select an option"
+          }
+        ],
+        "answers": [
+          {
+            "value": "Yes",
+            "route": "risk-management-plan-identical-rmp-reference-regulator"
+          },
+          {
+            "value": "No",
+            "route": "risk-management-plan-identical-rmp-reference-regulator"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "sectionName": "Tailor your application",
+    "identifier": "risk-management-plan-identical-rmp-reference-regulator",
+    "question": "Is your proposed Risk Management Plan (RMP) identical to the RMP approved by the reference regulator?",
+    "fields": [
+      {
+        "type": "radio",
+        "identifier": "is-rmp-identical-to-approved-by-rr-rradio",
+        "validations": [
+          {
+            "required": "select an option"
+          }
+        ],
+        "answers": [
+          {
+            "value": "Yes",
+            "route": "check-and-confirm-your-answers"
+          },
+          {
+            "value": "No",
+            "route": "check-and-confirm-your-answers"
+          }
+        ]
+      }
+    ],
+    "route": "check-and-confirm-your-answers"
+  },
+  {
+    "sectionName": "Tailor your application",
+    "identifier": "you-cannot-use-this-service",
+    "showSubmitButton": false,
+    "isCancelButtonRequired": false,
+    "isDashboardLinkRequired": true,
+    "dashboardLinkText": "Go to Choose submission type",
+    "dashboardLinkHref": "/TBD",
+    "question": "You cannot use this service",
+    "fields": [
+      {
+        "identifier": "cannot-use-this-service-paragraph-content",
+        "type": "paragraph",
+        "content": [
+          "You cannot proceed with this application because it falls under the mandatory scope of community procedures (also known as centralised procedures).",
+          "You can contact MHRA for further advice at [info@mhra.gov.uk](mailto:info@mhra.gov.uk)."
+        ]
+      }
+    ]
+  },
+  {
+    "sectionName": "Tailor your application",
+    "identifier": "select-windsor-framework-category-that-applies-to-your-product",
+    "question": "Select the Windsor framework category that applies to your product",
+    "fields": [
+      {
+        "identifier": "mhra-guidance-paragraph",
+        "type": "paragraph",
+        "content": [
+          "Refer to [MHRA guidance on Windsor Framework (opens new tab)](#) if you are unsure which category to select."
+        ]
+      },
+      {
+        "identifier": "select-windsor-category",
+        "type": "radio",
+        "validations": [
+          {
+            "required": "You must select the Windsor Framework category that applies to your product"
+          }
+        ],
+        "answers": [
+          {
+            "value": "Category 1",
+            "route": "what-is-your-licence-number"
+          },
+          {
+            "value": "Category 2",
+            "route": "what-is-your-licence-number"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "sectionName": "Tailor your application",
+    "showSubmitButton": false,
+    "isCancelButtonRequired": false,
+    "isDashboardLinkRequired": true,
+    "dashboardLinkText": "Go to Choose submission type",
+    "dashboardLinkHref": "/TBD",
+    "identifier": "you-cannot-use-this-third-party-service",
+    "question": "You cannot use this service",
+    "fields": [
+      {
+        "identifier": "cannot-use-service-third-party-paragraph",
+        "type": "paragraph",
+        "content": [
+          "You cannot proceed with this application because you can not confirm that the third party will fulfil their legal obligations."
+        ]
+      },
+      {
+        "identifier": "cannot-use-service-info-link-paragraph",
+        "type": "paragraph",
+        "content": [
+          "Contact MHRA for further advice on [info@mhra.gov.uk](mailto:info@mhra.gov.uk)."
+        ]
+      }
+    ]
+  },
+  {
+    "sectionName": "Tailor your application",
+    "identifier": "you-cannot-use-this-confirm-statement-service",
+    "showSubmitButton": false,
+    "isCancelButtonRequired": false,
+    "isDashboardLinkRequired": true,
+    "dashboardLinkText": "Go to Choose submission type",
+    "dashboardLinkHref": "/TBD",
+    "question": "You cannot use this service",
+    "fields": [
+      {
+        "identifier": "cannot-use-service-confirm-statements-paragraph",
+        "type": "paragraph",
+        "content": [
+          "You cannot proceed with this application, because you couldn’t confirm the statements."
+        ]
+      },
+      {
+        "identifier": "cannot-use-service-info-link-paragraph",
+        "type": "paragraph",
+        "content": [
+          "Contact MHRA for further advice on [info@mhra.gov.uk](mailto:info@mhra.gov.uk)."
+        ]
+      }
+    ]
+  }
+]

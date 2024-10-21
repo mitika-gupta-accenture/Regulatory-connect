@@ -1,0 +1,84 @@
+[
+  {
+    "section": "suspect-seller",
+    "fields": [
+      {
+        "label": null,
+        "identifiers": ["why-are-you-reporting-radios"]
+      }
+    ]
+  },
+  {
+    "section": "why-do-you-suspect-seller",
+    "fields": [
+      {
+        "label": "Why do you think that the website sells medicines illegally?",
+        "identifiers": [
+          "why-do-you-suspect-radios",
+          "why-user-suspects-the-website"
+        ]
+      }
+    ]
+  },
+  {
+    "section": "seller-name",
+    "fields": [
+      {
+        "label": "Name of the seller or their website",
+        "identifiers": ["seller-details-name"]
+      },
+      {
+        "label": "Website address or URL",
+        "identifiers": [
+          "seller-details-do-you-have-website",
+          "link-to-sellers-website"
+        ]
+      }
+    ]
+  },
+  {
+    "section": "evidence-of-seller",
+    "fields": [
+      {
+        "label": "Images of the website",
+        "identifiers": ["evidence-of-seller-radios", "upload-screenshots"]
+      }
+    ]
+  },
+  {
+    "section": "more-evidence",
+    "fields": [
+      {
+        "label": "Images of the medicine or the packaging it came in",
+        "identifiers": ["more-evidence-radios", "upload-screenshots"]
+      }
+    ]
+  },
+  {
+    "section": "additional-information",
+    "fields": [
+      {
+        "label": "Any other information about the website",
+        "identifiers": ["additional-information-input"]
+      }
+    ]
+  },
+  {
+    "section": "are-you-willing-to-be-contacted",
+    "fields": [
+      {
+        "label": null,
+        "identifiers": ["are-you-willing-to-be-contacted-radios"]
+      }
+    ]
+  },
+  {
+    "section": "what-are-your-contact-details",
+    "fields": [
+      {
+        "label": "Contact details",
+        "identifiers": ["your-name", "email-address", "telephone-number"]
+      }
+    ]
+  }
+]

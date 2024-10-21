@@ -1,0 +1,98 @@
+[
+  {
+    "sectionName": "Onboard an organisation",
+    "identifier": "organisation-search",
+    "question": "Search for your organisation",
+    "fields": [
+      {
+        "type": "paragraph",
+        "content": [
+          "To find your organisation's details, you can search using your company registration number or organisation name."
+        ]
+      },
+      {
+        "identifier": "organisation-search-radios",
+        "type": "radio",
+        "label": "Search using your registration number or name",
+        "validations": [
+          {
+            "required": "Select your preferred search method"
+          }
+        ],
+        "answers": [
+          {
+            "value": "Company registration number",
+            "route": "select-your-organisation",
+            "fields": [
+              {
+                "identifier": "organisation-search-registration-number",
+                "type": "text",
+                "hint": "This is your limited company registration number",
+                "validations": [
+                  {
+                    "required": "Enter your limited company registration number"
+                  }
+                ],
+                "errorMessage": "Enter your limited company registration number",
+                "size": 40
+              }
+            ]
+          },
+          {
+            "value": "Organisation name",
+            "route": "select-your-organisation",
+            "fields": [
+              {
+                "identifier": "organisation-search-organisation-name",
+                "type": "text",
+                "hint": "This is your limited company name",
+                "validations": [
+                  {
+                    "required": "Enter your limited company name"
+                  }
+                ],
+                "errorMessage": "Enter your limited company name",
+                "size": 40
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": ["This search will use information held by Companies House."]
+      }
+    ],
+    "route": "select-your-organisation"
+  },
+  {
+    "sectionName": "Onboard organisation",
+    "identifier": "select-your-organisation",
+    "fields": [
+      {
+        "type": "heading",
+        "identifier": "select-organisation-heading",
+        "text": "Select your organisation"
+      },
+      {
+        "type": "paragraph",
+        "identifier": "select-organisation-paragraph",
+        "content": [
+          "The following results are based on the information you have provided."
+        ]
+      },
+      {
+        "type": "server-component",
+        "rule": "select-organisation",
+        "identifier": "select-organisation"
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          "[My organisation is not listed](/organisation-name)"
+        ]
+      }
+    ],
+    "route": "confirm-organisation-details"
+  }
+]

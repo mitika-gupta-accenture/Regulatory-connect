@@ -1,0 +1,66 @@
+{
+  "answersArr": {
+    "answers": [
+      {
+        "type": "answer",
+        "question": "Does your application relate to:",
+        "answer": "Type II",
+        "number": 0
+      },
+      {
+        "type": "answer",
+        "question": "Do any of the below changes apply to your Type II procedure (Type II Complex variation):",
+        "answer": "No",
+        "number": 1
+      },
+      {
+        "type": "answer",
+        "question": "Does your application consist of a:",
+        "answer": "Single",
+        "number": 6
+      },
+      {
+        "type": "answer",
+        "question": "What is the route of your variation?",
+        "answer": "National procedure",
+        "number": 7
+      },
+      {
+        "type": "answer",
+        "question": "How many additional strengths of the same dosage form are you submitting? (If it is a single submission, please set to 0.)",
+        "answer": 2,
+        "number": 8
+      }
+    ],
+    "keyPoints": [
+      {
+        "type": "key point",
+        "question": "Do any of the below changes apply to your Type II procedure (Type II Complex variation):",
+        "identifier": "feeType",
+        "answer": "Type II",
+        "number": 1
+      },
+      {
+        "type": "key point",
+        "question": "Does your application consist of a:",
+        "identifier": "group",
+        "answer": "Single",
+        "number": 6
+      },
+      {
+        "type": "key point",
+        "question": "What is the route of your variation?",
+        "identifier": "route",
+        "answer": "National procedure",
+        "number": 7
+      },
+      {
+        "type": "key point",
+        "question": "How many additional strengths of the same dosage form are you submitting? (If it is a single submission, please set to 0.)",
+        "identifier": "additionalStrengths",
+        "answer": 2,
+        "number": 8
+      }
+    ]
+  }
+}

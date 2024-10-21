@@ -1,0 +1,14 @@
+{
+    "launch": {
+        "configurations": [],
+        "compounds": []
+    },
+    "folders": [
+        {
+            "path": "."
+        },
+        {
+            "path": "frontend"
+        }
+    ]
+}

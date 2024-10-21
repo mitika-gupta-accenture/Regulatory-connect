@@ -1,0 +1,64 @@
+{
+  "answers": [
+    {
+      "type": "answer",
+      "question": "What is the route of your application?",
+      "answer": "National procedure",
+      "number": 0
+    },
+    {
+      "type": "answer",
+      "question": "What is the scope of your application?",
+      "answer": "Traditional Herbal Registrations (THR)",
+      "number": 1
+    },
+    {
+      "type": "answer",
+      "question": "Have all the herbal preparations (active ingredients) of your product previously been authorised in the UK?",
+      "answer": "Yes",
+      "number": 8
+    },
+    {
+      "type": "answer",
+      "question": "How many herbal preparations (active ingredients) your product contains",
+      "answer": "One",
+      "number": 9
+    },
+    {
+      "type": "answer",
+      "question": "Does any of the following apply to your medicinal product(s)?",
+      "answer": "Contains ancillary vitamins/minerals covered with a CEP",
+      "number": 12
+    }
+  ],
+  "keyPoints": [
+    {
+      "type": "key point",
+      "question": "What is the route of your application?",
+      "identifier": "route",
+      "answer": "National",
+      "number": 0
+    },
+    {
+      "type": "key point",
+      "question": "What is the scope of your application?",
+      "identifier": "scope",
+      "answer": "THR",
+      "number": 1
+    },
+    {
+      "type": "key point",
+      "question": "How many herbal preparations (active ingredients) your product contains",
+      "identifier": "feeType",
+      "answer": ["THRComplexSingle", ""],
+      "number": 9
+    },
+    {
+      "type": "key point",
+      "question": "Does any of the following apply to your medicinal product(s)?",
+      "identifier": "plusFees",
+      "answer": ["THRPlusAncillaryCEP", ""],
+      "number": 12
+    }
+  ]
+}

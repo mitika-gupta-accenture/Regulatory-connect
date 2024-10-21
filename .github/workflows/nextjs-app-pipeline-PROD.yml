@@ -1,0 +1,116 @@
+name: NextJs Pipeline for Prod deployment
+on:
+  push:
+    tags:
+       - 'v*.*.*'
+
+jobs:
+  Build:
+    uses: ./.github/workflows/nextjs-app-ci.yml
+    with:
+      NODE_VERSION: '20.x'
+      artifact_destination: 'Github'
+      environment: 'Prod'
+      app_name: 'rc-nextjs-app'
+      src_path: frontend
+      config_path: 'env'
+      nexus_artifact_group_id: rc-nextjs-prod
+      nexus_artifact_id: frontend
+    secrets:
+      NPM_REGISTRY_PAT: ${{ secrets.NPM_REGISTRY_PAT }}
+      AZURE_CREDENTIALS_RC: ${{ secrets.AZURE_CREDENTIALS_RC }}
+      
+  Start-staging-slot:
+    needs: Build
+    runs-on: gp-prod-runner-set
+    environment:
+      name: 'Staging'
+    steps:
+      - name: "Log in with Azure 🆔"
+        uses: azure/login@v2
+        with:
+          creds: '${{ secrets.AZURE_CREDENTIALS_RMS }}'
+
+      - name: "start the Staging Slot"
+        run: |
+          az webapp start --name ase-rms-prod01-uks-01 --resource-group rg-mhra-prod-uks-rms --slot staging
+
+  Staging:
+    needs: Start-staging-slot
+    uses: ./.github/workflows/nextjs-app-deploy-app-service.yml
+    with: 
+      environment: 'Staging'
+      AZURE_WEBAPP_NAME: 
+      resource_group: 
+      slot_name_r2: 'staging'
+      src_path: 'frontend/src'
+      app_name: 'rc-nextjs-app'
+      config_path: 'env'
+      artifact_destination: 'Github'
+      nexus_artifact_group_id: rc-nextjs-prod
+      nexus_artifact_id: frontend
+    secrets:
+      AZURE_CREDENTIALS_RC: ${{ secrets.AZURE_CREDENTIALS_RC}}
+      REPO_READ_PAT: ${{ secrets.REPO_READ_PAT }}
+
+  DAST-Staging:
+    needs: Staging
+    uses: ./.github/workflows/nextjs-app-DAST.yml
+    with:
+      APP_URL: ${{ needs.Staging.outputs.appurl }}
+      environment: 'Staging'
+      artifact_destination: 'Github'
+      nexus_artifact_group_id: rc-nextjs
+      nexus_artifact_id: frontend
+
+  Test-Accessibility-Staging:
+    needs: Staging
+    uses: ./.github/workflows/nextjs-app-run-pa11y.yml
+    with:
+      environment: 'PROD'
+      src_path: frontend
+      artifact_destination: 'Github'
+      nexus_artifact_group_id: rc-nextjs-prod
+      nexus_artifact_id: frontend
+
+  Read-Approval:
+    runs-on: gp-prod-runner-set
+    environment: Approval-Gate
+    needs: Staging
+    steps:
+      - name: "Approval Status"
+        run: |
+          echo "Approval Completed" 
+   
+  Production:
+    needs: Read-Approval
+    environment:
+      name: 'Prod'
+    runs-on: gp-prod-runner-set
+    steps:
+      - name: "Log in with Azure 🆔"
+        uses: azure/login@v2
+        with:
+          creds: '${{ secrets.AZURE_CREDENTIALS_RC }}'
+          
+      - name: "Swap App Service Staging and Production Slots 🥏"
+        uses: azure/CLI@v1
+        with:
+          inlineScript: |
+            az webapp deployment slot swap --name ${{ vars.AZURE_WEBAPP_NAME }} --resource-group ${{ vars.AZURE_RESOURCE_GROUP }} --slot staging --target-slot production   
+
+
+  Stop-staging-slot:
+    needs: Production
+    runs-on: gp-prod-runner-set
+    environment:
+      name: 'Staging'
+    steps:
+      - name: "Log in with Azure 🆔"
+        uses: azure/login@v2
+        with:
+          creds: '${{ secrets.AZURE_CREDENTIALS_RMS }}'
+
+      - name: "stop the Staging Slot"
+        run: |
+          az webapp stop --name ase-rms-prod01-uks-01 --resource-group rg-mhra-prod-uks-rms --slot staging

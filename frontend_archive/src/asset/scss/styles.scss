@@ -1,0 +1,48 @@
+// $govuk-assets-path: './../assets/';
+$govuk-images-path: "./../../../../../node_modules/govuk-frontend/govuk/assets/images/";
+$govuk-fonts-path: "./../../../../node_modules/govuk-frontend/govuk/assets/fonts/";
+
+@import "node_modules/govuk-frontend/govuk/all";
+
+body {
+    margin: auto;
+}
+.autoCompleteInputBox {
+    font-size: 12px;
+}
+.autoCompleteSuggList {
+    border: 2px solid #0b0c0c;
+    border-top: 1px;
+    cursor: pointer;
+    padding: 5px;
+    margin-bottom: 0 !important;
+}
+.autoCompleteSuggList:hover,
+.autoCompleteSuggList:focus,
+.autoCompleteSuggList:focus-visible
+ {
+    cursor: pointer;
+    background-color: #1d70b8;
+    color: #fff;
+}
+
+.autoCompleteNoResFound,
+.autoCompleteNoResFound:hover,
+.autoCompleteNoResFound:focus
+ {
+    pointer-events: visiblestroke;
+    cursor: not-allowed;
+}
+
+.goBackLink:hover {
+    cursor: pointer,
+}
+
+.govuk-submissionType-links{
+    padding: 0px 0px 0px 0px;
+}
+
+.govuk-submissionType-sections{
+    margin: 20px 0px 40px 0px;
+    font-weight: bold;
+}

@@ -1,0 +1,419 @@
+name: Deploy
+on:
+  workflow_call:
+    inputs:
+      environment:
+        default: "Dev"
+        required: true
+        type: string
+      AZURE_WEBAPP_NAME:
+        default: 
+        required: true
+        type: string
+      slot_name_r2:
+        required: false
+        type: string
+      resource_group:
+        default: 
+        required: true
+        type: string
+      keyvault_name:
+        required: false
+        type: string
+      src_path:
+        required: true
+        type: string
+      app_name:
+        required: true
+        type: string
+      config_path:
+        required: false
+        type: string
+      artifact_destination:
+        required: true
+        type: string
+        default: Github
+      nexus_artifact_group_id:
+        required: false
+        type: string
+      nexus_artifact_id:
+        required: false
+        type: string
+    secrets:
+      AZURE_CREDENTIALS_RC:
+        required: false
+      REPO_READ_PAT:
+        required: false
+      SUB_ID:
+        required: false
+      AZURE_CREDENTIALS_B2C_CLIENT_ID:
+        required: false
+      AZURE_CREDENTIALS_B2C_CLIENT_SECRET:
+        required: false
+      AZURE_CREDENTIALS_B2C_TENANT:
+        required: false
+    outputs:
+      appurl:
+        description: "WebApp URL"
+        value: ${{ jobs.Deployment.outputs.outputurl }}
+      slotname:
+        description: "Deployment Slot Name"
+        value: ${{ jobs.Deployment.outputs.slotname }}
+
+jobs:
+  Deployment:
+    runs-on: gp-prod-runner-set
+    environment:
+      name: ${{ inputs.environment }}
+    env:
+      # nexus_artifact_repository: Regulatory-connect
+      nexus_artifact_repository: releases
+      nexus_server: https://devops-platform.mhra.gov.uk/nexus
+    outputs:
+      slotname: ${{ steps.setslotname.outputs.slotname }}
+      deployment_status: ${{ steps.set-deploy-status.outputs.deployment_status }}
+      deployment_type: ${{ steps.deployment_branch.outputs.deployment_type }}
+      outputurl: ${{ steps.deploy-to-webapp.outputs.webapp-url }}${{ steps.deploy-to-webapp-slot.outputs.webapp-url }}
+    steps:
+      - name: "Cleaning up Workspace"
+        working-directory: ${{ github.workspace }}
+        run: |
+          echo "Cleaning up previous run"
+          rm -rf *
+          ls -al '${{ github.workspace }}'
+
+      - name: "Checkout code ☁️"
+        uses: actions/checkout@v4
+        
+      - name: "Validate Deployment Branch Name"
+        id: deployment_branch
+        run: |
+          if [[ (${{ github.ref }} != 'refs/heads/main' && ${{ github.ref }} != 'refs/heads/develop') && ${{ inputs.environment }} = 'Dev' ]]
+          then
+            echo "deployment_type=feature_slot" >> $GITHUB_OUTPUT
+          elif [[ ${{ github.ref }} = 'refs/heads/develop' ]]
+          then
+            echo "deployment_type=develop" >> $GITHUB_OUTPUT
+          elif [[ ${{ github.ref }} = 'refs/heads/sit' || ${{ inputs.environment }} = 'SIT' ]]
+          then
+            echo "deployment_type=sit" >> $GITHUB_OUTPUT
+
+          elif [[ ${{ github.ref }} = refs/heads/release* && ${{ inputs.environment }} = 'PERF' ]]
+          then
+            echo "deployment_type=perf" >> $GITHUB_OUTPUT
+
+          elif [[ ${{ github.ref }} = refs/heads/release* && ${{ inputs.environment }} = 'PRE-UAT' ]]
+          then
+            echo "deployment_type=pre-uat" >> $GITHUB_OUTPUT
+
+          elif [[ ${{ github.ref }} = refs/heads/release* && ${{ inputs.environment }} = 'UAT' ]]
+          then
+            echo "deployment_type=uat" >> $GITHUB_OUTPUT
+            
+          elif [[ ${{ github.ref }}  = 'refs/heads/main' || ${{ github.ref }} == refs/tags/v* ]]
+          then
+            echo "deployment_type=prod" >> $GITHUB_OUTPUT
+          else
+            echo "Branch naming is not correct"
+          fi
+
+      - name: "Determine Slot Name"
+        env: 
+          environment: ${{ inputs.environment }}
+          deployment_type: ${{ steps.deployment_branch.outputs.deployment_type }}
+        if: ${{ env.deployment_type == 'feature_slot' || env.deployment_type == 'prod' || env.deployment_type == 'pre-uat' }}
+        id: setslotname
+        run: |
+          if [[ ${{ env.deployment_type }} = "prod" || ${{ env.deployment_type }}  == 'pre-uat' ]]
+          then
+            echo "Setting slotname for Prod Deployment"
+            slotname=${{ inputs.slot_name_r2 }}
+            echo "slotname=$slotname" >> $GITHUB_OUTPUT
+          else
+            echo "Setting slotname for Feature Branch Deployment"
+            if [[ ${{ github.event_name }} = "push" ]]
+            then
+              echo "Github Ref: $GITHUB_REF_NAME"
+              slotname=$(echo $GITHUB_REF_NAME | cut -d '/' -f 2)
+            elif [[ ${{ github.event_name }} = "pull_request" ]]
+            then
+              echo "Github Head: $GITHUB_HEAD_REF"
+              slotname=$(echo $GITHUB_HEAD_REF | cut -d '/' -f 2)
+            else
+              echo "Github event $event_name is invalid"
+            fi
+            echo "slotname before trimming: $slotname"
+            slotname=${slotname:5:19}-$environment
+            if [[ ${slotname:0:1} = '-' ]]; then slotname=${slotname:1}; fi
+            slotname=$(echo $slotname | tr '[:upper:]' '[:lower:]' | sed 's/_/-/g')
+
+            echo "slotname=$slotname" >> $GITHUB_OUTPUT
+          fi
+          echo "The slot name is ${slotname}"
+
+      - name: "Update B2C tenant app reg with redirect URLs with slot url"
+        env: 
+          slotname: ${{ steps.setslotname.outputs.slotname }}
+          deployment_type: ${{ steps.deployment_branch.outputs.deployment_type }}
+        if: ${{ env.deployment_type == 'feature_slot' }}
+        shell: pwsh
+        run: |
+          az login --service-principal -u ${{ secrets.AZURE_CREDENTIALS_B2C_CLIENT_ID }} -p=${{ secrets.AZURE_CREDENTIALS_B2C_CLIENT_SECRET }} --tenant ${{ secrets.AZURE_CREDENTIALS_B2C_TENANT }} --allow-no-subscriptions
+          $objectid = az ad app show --id ${{ vars.NEXT_PUBLIC_MSAL_CLIENT_ID }} --query id --output tsv
+          $graphurl = "https://graph.microsoft.com/v1.0/applications/$objectid"
+          $existingredirecturllist = az ad app show --id ${{ vars.NEXT_PUBLIC_MSAL_CLIENT_ID }} --query spa.redirectUris --output tsv
+          $newredirecturl = "https://${{ inputs.AZURE_WEBAPP_NAME }}-$Env:slotname.azurewebsites.net/user-registration"
+          if ($existingredirecturllist.Contains($newredirecturl)) {
+            $new_redirecturl_list = $existingredirecturllist | ConvertTo-Json -Compress
+          } else {
+            $new_redirecturl_list = $existingredirecturllist + $newredirecturl | ConvertTo-Json -Compress
+          }
+          $body = "{`"spa`":{`"redirectUris`":$($new_redirecturl_list)}}"
+          az rest --method PATCH --uri $graphurl --headers 'Content-Type=application/json' --body $body
+
+      - name: "Log in with Azure 🆔"
+        uses: azure/login@v2
+        with:
+          creds: "${{ secrets.AZURE_CREDENTIALS_RC }}"
+
+      - name: "Create Feature-Branch Slot⚡"
+        id: createslot
+        if: ${{ steps.deployment_branch.outputs.deployment_type == 'feature_slot' && steps.setslotname.outcome == 'success' }}
+        working-directory: ${{ inputs.config_path }}
+        env:
+          slotname: ${{ steps.setslotname.outputs.slotname }}
+        run: |
+            az webapp deployment slot create --output none --name ${{ inputs.AZURE_WEBAPP_NAME }} --resource-group ${{ inputs.resource_group }} --slot ${{env.slotname}} --configuration-source ${{ inputs.AZURE_WEBAPP_NAME }}
+            echo "Slot has been created"
+
+            # Enable Vnet Integration
+            VNET_ID=$(echo ${{ vars.VNET_RESOURCE_ID }} | sed "s/SUB_ID/${{ secrets.SUB_ID }}/g")
+            az webapp vnet-integration add --output none --skip-delegation-check false \
+            --name ${{ inputs.AZURE_WEBAPP_NAME }} --resource-group ${{ inputs.resource_group }} \
+            --subnet ${{ vars.ASE_SUBNET_NAME }} --vnet $VNET_ID --slot ${{ env.slotname }}
+
+            echo "Vnet Integration has been enabled"
+            
+            # Enable VDI and Runner IP for the slot
+            az webapp update --output none --resource-group ${{ inputs.resource_group }} --name ${{ inputs.AZURE_WEBAPP_NAME }} --slot ${{env.slotname}} --set publicNetworkAccess=Enabled
+            az webapp config access-restriction add --output none --resource-group ${{ inputs.resource_group }} --name ${{ inputs.AZURE_WEBAPP_NAME }} --slot ${{env.slotname}} --rule-name "VDI" --action Allow --ip-address 37.130.234.1/32 --priority 101
+            az webapp config access-restriction add --output none --resource-group ${{ inputs.resource_group }} --name ${{ inputs.AZURE_WEBAPP_NAME }} --slot ${{env.slotname}} --rule-name "runners" --action Allow --ip-address 51.11.169.23/32 --priority 102
+            
+            echo "Enable VDI and Runner IP for the slot - completed "
+
+            # Enable managed identity for the web app
+            az webapp identity assign --output none --name ${{ inputs.AZURE_WEBAPP_NAME }} --resource-group ${{ inputs.resource_group }} --slot ${{env.slotname}}
+           
+            echo "Enable managed identity for the web app - completed "
+
+            # Fetch Object ID of the managed identity
+            object_id=$(az webapp identity show --name ${{ inputs.AZURE_WEBAPP_NAME }} --resource-group ${{ inputs.resource_group }} --slot ${{env.slotname}} --query principalId --output tsv)
+            
+            # Add access policy to Key Vault for the managed identity
+            az keyvault set-policy --output none --name ${{ inputs.keyvault_name }} --object-id $object_id --secret-permissions get list --resource-group ${{ inputs.resource_group }}
+
+            echo "Add access policy to Key Vault for the managed identity - completed "
+
+      - name: "Apply App-Setting to Azure Web App - ${{ inputs.AZURE_WEBAPP_NAME }}"
+        working-directory: ${{ inputs.config_path }}
+        env: 
+          deployment_type: ${{ steps.deployment_branch.outputs.deployment_type }}
+        if: ${{ env.deployment_type == 'develop' || env.deployment_type == 'sit' || env.deployment_type == 'perf' || env.deployment_type == 'uat' }}
+        run: |
+          env_name=$(echo ${{ inputs.environment }} | tr '[:upper:]' '[:lower:]')
+          az webapp config appsettings set --output none \
+          -g ${{ inputs.resource_group }} -n ${{ inputs.AZURE_WEBAPP_NAME }} \
+          --settings @"${env_name}_config.json" 
+          
+
+          echo "App-Settings has been applied successfully"
+      
+      - name: "Apply App-Setting to Azure Web App - ${{ inputs.AZURE_WEBAPP_NAME }} with ${{ steps.setslotname.outputs.slotname }} Slot"
+        working-directory: ${{ inputs.config_path }}
+        env: 
+          deployment_type: ${{ steps.deployment_branch.outputs.deployment_type }}
+          slotname: ${{ steps.setslotname.outputs.slotname }}
+        if: ${{ env.deployment_type == 'feature_slot' || env.deployment_type == 'prod' || env.deployment_type == 'pre-uat' }}
+        run: |
+          env_name=$(echo ${{ inputs.environment }} | tr '[:upper:]' '[:lower:]')
+          az webapp config appsettings set --output none \
+          -g ${{ inputs.resource_group }} -n ${{ inputs.AZURE_WEBAPP_NAME }} \
+          --slot ${{env.slotname}} --settings @"${env_name}_config.json" 
+          
+          echo "App-Settings has been applied successfully"
+
+
+      - name: "Download build artifacts ⬇️"
+        if: ${{ inputs.artifact_destination == 'Github' }}
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.app_name }}
+
+      - name: "Download artifact from Nexus for Deployment"
+        if: ${{ inputs.artifact_destination == 'Nexus' }}
+        run: |
+          echo "Version: ${{ github.run_number }}"
+          echo "Nexus Artifact Name: ${{ inputs.nexus_artifact_id }}"
+          echo "Version: ${{ github.run_number }}"
+          echo "Artifact Repository: ${{ env.nexus_artifact_repository }}"
+          echo "Group Id: ${{ inputs.nexus_artifact_group_id }}"
+
+          mvn -X -D"transitive=false" \
+          -D"artifactId=${{ inputs.nexus_artifact_id }}" \
+          -D"groupId=${{ inputs.nexus_artifact_group_id }}" \
+          -D"remoteRepositories=${{ env.nexus_artifact_repository }}::default::${{ env.nexus_server }}" \
+          -D"packaging=zip" \
+          -D"dest=${{ github.workspace }}" \
+          -D"version=${{ github.run_number }}" \
+          org.apache.maven.plugins:maven-dependency-plugin:2.8:get
+
+          echo "Update artifact name"
+          mv ${{ inputs.nexus_artifact_id }}-${{ github.run_number }}.zip ${{ inputs.app_name }}.zip
+
+      - run: unzip -q -o ${{ inputs.app_name }}.zip
+
+      - name: "Replace all NEXT_PUBLIC in build artifacts with environment-specific env vars"
+        shell: pwsh
+        env:
+          deployment_type: ${{ steps.deployment_branch.outputs.deployment_type }}
+          slotname: ${{ steps.setslotname.outputs.slotname }}
+          NEXT_PUBLIC_MSAL_AUTHORITY: ${{ vars.NEXT_PUBLIC_MSAL_AUTHORITY }}
+          NEXT_PUBLIC_MSAL_CLIENT_ID: ${{ vars.NEXT_PUBLIC_MSAL_CLIENT_ID }}
+          NEXT_PUBLIC_MSAL_REDIRECT_URI: ${{ vars.NEXT_PUBLIC_MSAL_REDIRECT_URI }}
+          AZURE_WEBAPP_NAME: ${{ inputs.AZURE_WEBAPP_NAME }}
+          NEXT_PUBLIC_MSAL_KNOWN_AUTHORITIES: ${{ vars.NEXT_PUBLIC_MSAL_KNOWN_AUTHORITIES }}
+          NEXT_PUBLIC_API_BASE_URL: ${{ vars.NEXT_PUBLIC_API_BASE_URL }}
+          NEXT_PUBLIC_SESSION_TTL: ${{ vars.NEXT_PUBLIC_SESSION_TTL }}
+        run: |
+          if ($Env:deployment_type -eq "feature_slot") {
+            $Env:NEXT_PUBLIC_MSAL_REDIRECT_URI = "https://$Env:AZURE_WEBAPP_NAME-$Env:slotname.azurewebsites.net/user-registration"
+          }
+          
+          $NEXT_PUBLIC_placeholders = Get-Content -Path "all_next_public_build_env_vars.txt"
+          cd .next/standalone
+
+          $jsFiles = Get-ChildItem -Path '.next/server/chunks/' -Recurse -Filter "*.js"
+
+          foreach ($jsFile in $jsFiles) {
+            $jsFileContent = Get-Content -Raw -LiteralPath $jsFile.FullName
+
+            foreach ($NEXT_PUBLIC_placeholder in $NEXT_PUBLIC_placeholders) {
+              $envVarValue = [System.Environment]::GetEnvironmentVariable("$NEXT_PUBLIC_placeholder")
+              $jsFileContent = $jsFileContent.Replace($NEXT_PUBLIC_placeholder, $envVarValue)
+            }
+
+            $jsFileContent | Out-File -LiteralPath $jsFile.FullName -Force
+          }
+
+          $jsFiles = Get-ChildItem -Path '.next/static/chunks/app' -Recurse -Filter "*.js"
+
+          foreach ($jsFile in $jsFiles) {
+            $jsFileContent = Get-Content -Raw -LiteralPath $jsFile.FullName
+
+            foreach ($NEXT_PUBLIC_placeholder in $NEXT_PUBLIC_placeholders) {
+              $envVarValue = [System.Environment]::GetEnvironmentVariable("$NEXT_PUBLIC_placeholder")
+              $jsFileContent = $jsFileContent.Replace($NEXT_PUBLIC_placeholder, $envVarValue)
+            }
+
+            $jsFileContent | Out-File -LiteralPath $jsFile.FullName -Force
+          }
+
+      - name: "Zip standalone directory and create local storage folder for App Deploy 💼"
+        run: |
+          cd .next/standalone
+          mkdir local-storage
+          chmod 777 local-storage
+          zip -r ../../deploy.zip .
+      
+      - name: 'Deploy ZIP to Azure Web App - ${{ inputs.AZURE_WEBAPP_NAME }} 🛫'
+        env: 
+          deployment_type: ${{ steps.deployment_branch.outputs.deployment_type }}
+        if: ${{ env.deployment_type == 'develop' || env.deployment_type == 'sit' || env.deployment_type == 'perf' || env.deployment_type == 'uat' }}
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ inputs.AZURE_WEBAPP_NAME }}
+          package: ${{github.workspace}}/deploy.zip
+          # package: ${{github.workspace}}/${{ inputs.src_path }}/deploy.zip
+
+      - name: 'Deploy ZIP to Azure Web App - ${{ inputs.AZURE_WEBAPP_NAME }} with ${{ steps.setslotname.outputs.slotname }} Slot 🛫'
+        env: 
+          deployment_type: ${{ steps.deployment_branch.outputs.deployment_type }}
+        if: ${{ env.deployment_type == 'feature_slot' || env.deployment_type == 'prod' || env.deployment_type == 'pre-uat' }}
+        id: deploy-to-webapp-slot
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ inputs.AZURE_WEBAPP_NAME }}
+          package: ${{github.workspace}}/deploy.zip
+          # package: ${{github.workspace}}/${{ inputs.src_path }}/deploy.zip
+          slot-name: ${{ steps.setslotname.outputs.slotname }}
+
+      - name: 'Set Deployment Status'
+        if: ${{ env.deployment_type == 'uat' ||  env.deployment_type == 'prod' }}
+        id: set-deploy-status
+        env: 
+          deployment_type: ${{ steps.deployment_branch.outputs.deployment_type }}
+        run: |
+          if [[ ${{ steps.deploy-to-webapp.outcome }} = 'success' || ${{ steps.deploy-to-webapp-slot.outcome }} = 'success' ]]
+          then
+            echo "${{ env.deployment_type }} has completed, Sending Success Email Notification"
+            echo "deployment_status=success" >> $GITHUB_OUTPUT
+          elif [[ ${{ steps.deploy-to-webapp.outcome }} = 'failure' || ${{ steps.deploy-to-webapp-slot.outcome }} = 'failure' ]]
+          then
+            echo "${{ env.deployment_type }} has failed, Sending Failure Email Notification"
+            echo "deployment_status=failure" >> $GITHUB_OUTPUT
+          else
+            echo "Something has failed, please check"
+          fi
+
+  Send-Email:
+    needs: Deployment
+    runs-on: gp-prod-runner-set
+    if: ${{ needs.Deployment.outputs.deployment_status != '' }}
+    environment:
+      name: ${{ inputs.environment }}
+    env:
+      deploy_status: ${{ needs.Deployment.outputs.deployment_status }}
+      deployment_type: ${{ needs.Deployment.outputs.deployment_type }}
+      outputurl: ${{ needs.Deployment.outputs.outputurl }}
+    steps:
+
+      - name: "Cleaning up Workspace"
+        working-directory: ${{ github.workspace }}
+        run: |
+          echo "Cleaning up previous run"
+          rm -rf *
+          ls -al '${{ github.workspace }}'
+
+      # ==================================================
+      # Clone the Email template                
+      # ==================================================  
+      - name: 'Clone the Email template Repository'
+        uses: actions/checkout@v4
+        with:
+          repository: MHRA/devops-email-template
+          ref: main
+          path: email-trigger
+          token: ${{ secrets.REPO_READ_PAT }}
+      
+      - name: Python setup
+        uses: actions/setup-python@v3
+
+      - name: ${{ env.deployment_type }} deployment ${{ env.deploy_status }}
+        run: |
+          ## Email template
+          echo '<body><p> Hi,</p>
+          <p>${{github.repository}} - Frontend App ${{ inputs.AZURE_WEBAPP_NAME }} deployment is <b>${{ env.deploy_status }}</b> on ${{ env.deployment_type }} , please check https://github.com/${{github.repository}}/commit/${{github.sha}}/checks/${{github.run_id}} </p>
+          <p><b>Regards,</b></p>
+          <p><b>GitHub Actions</b></p>
+          </body>' > ${{ github.workspace }}/email.html
+
+          ## Send EMAIL
+          todayinDay=$(date +"%A")
+          todayinDatetimestamp=$(TZ=Europe/London date +"%d/%m/%Y %H:%M:%S")
+          mailsubject="${{github.repository}} - Deployment ${{ env.deploy_status }} for Frontend App ${{ inputs.AZURE_WEBAPP_NAME }} on ${{ env.deployment_type }} "
+          mailsubject="${mailsubject} - ${todayinDatetimestamp}"
+          emailcheckoutpath="${{ github.workspace }}/email.html"
+          RC_FRONTEND_DEV=${{ vars.RC_FRONTEND_DEV }}
+          source ${{ github.workspace }}/email-trigger/rms_recipients_email_list.properties
+          python3 ${{ github.workspace }}/email-trigger/mail.py "$mailsubject" "$RC_FRONTEND_DEV" "$emailcheckoutpath"

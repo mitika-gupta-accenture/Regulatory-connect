@@ -1,0 +1,33 @@
+[
+  {
+    "sectionName": "Onboard an organisation",
+    "identifier": "organisation-location",
+    "question": "Is your organisation's head office address in the UK?",
+    "isCancelButtonRequired": false,
+    "fields": [
+      {
+        "type": "hint",
+        "text": "The UK consists of England, Northen Ireland, Scotland and Wales"
+      },
+      {
+        "identifier": "organisation-location-radios",
+        "type": "radio",
+        "validations": [
+          {
+            "required": "Select yes if your organisation's head office address is in the UK"
+          }
+        ],
+        "answers": [
+          {
+            "value": "Yes",
+            "route": "organisation-legal-status-uk"
+          },
+          {
+            "value": "No",
+            "route": "organisation-name"
+          }
+        ]
+      }
+    ]
+  }
+]

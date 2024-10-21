@@ -1,0 +1,34 @@
+{
+  "answersArr": {
+    "answers": [
+      {
+        "type": "answer",
+        "question": "Does your application relate to:",
+        "answer": "Type IA/IAIN/IA Group",
+        "number": 0
+      },
+      {
+        "type": "answer",
+        "question": "How many additional strengths of the same dosage form are you submitting? (If it is a single submission, please set to 0.)",
+        "answer": 5,
+        "number": 6
+      }
+    ],
+    "keyPoints": [
+      {
+        "type": "key point",
+        "question": "Does your application relate to:",
+        "identifier": "feeType",
+        "answer": "Type IA/IAIN/IA Group",
+        "number": 0
+      },
+      {
+        "type": "key point",
+        "question": "How many additional strengths of the same dosage form are you submitting? (If it is a single submission, please set to 0.)",
+        "identifier": "additionalStrengths",
+        "answer": 5,
+        "number": 6
+      }
+    ]
+  }
+}

@@ -1,0 +1,150 @@
+name: Teardown of deployment Slots
+on:
+  delete:
+
+jobs:
+  Get-Slot-Name:
+    runs-on: gp-prod-runner-set
+    if: ${{ startsWith(github.event.ref, 'feature/') || startsWith(github.event.ref, 'fix/') || startsWith(github.event.ref, 'hotfix/') }}
+    env:
+      branch_name: ${{ github.event.ref }}
+    outputs:
+      slotname: ${{ steps.setslotname.outputs.slotname }}
+    steps:
+      - name: "Cleaning up Workspace"
+        working-directory: ${{ github.workspace }}
+        run: |
+          echo "Cleaning up previous run"
+          rm -rf *
+          ls -al '${{ github.workspace }}'
+          
+      - name: "Get the slot name 📚"
+        id: setslotname
+        run: |
+          slotname=$(echo ${{ env.branch_name }} | cut -d '/' -f 2)
+          slotname=${slotname:5:19}-Dev
+          if [[ ${slotname:0:1} = '-' ]]; then slotname=${slotname:1}; fi
+          slotname=$(echo $slotname | tr '[:upper:]' '[:lower:]' | sed 's/_/-/g')
+          
+          echo "slotname=$slotname" >> $GITHUB_OUTPUT          
+          echo "The slot name is ${slotname}"
+
+  Teardown-Slots:
+    runs-on: gp-prod-runner-set
+    needs: Get-Slot-Name
+    if: ${{ startsWith(github.event.ref, 'feature/') || startsWith(github.event.ref, 'fix/') || startsWith(github.event.ref, 'hotfix/') }}
+    environment:
+      name: Dev
+    env:
+      slotname: ${{ needs.Get-Slot-Name.outputs.slotname }}
+      frontend_app_name: "ase-rms-dev01-uks-02"
+      rg_group_name: "rg-mhra-dev-uks-rms"
+    steps:
+      - name: "Cleaning up Workspace"
+        working-directory: ${{ github.workspace }}
+        run: |
+          echo "Cleaning up previous run"
+          rm -rf *
+          ls -al '${{ github.workspace }}'
+      
+      - name: "Log in with Azure 🆔"
+        uses: azure/login@v2
+        with:
+          creds: "${{ secrets.AZURE_CREDENTIALS_RC }}"
+
+      - name: "Teardown of Deployment slots 🚧"
+        run: |
+
+          # Get the slots list for App service 
+          az webapp deployment slot list --name ${{ env.frontend_app_name }} --resource-group ${{ env.rg_group_name }} --query "[].{name:name}" | sed 's/[{}]//g' | sed 's/\[//g;s/\]//g'| sed -n '/[^ ,]/p' | cut -d : -f 2 | tr -d '"' > frontend_list
+
+          # cleaning up app service slots
+          FFILENAME=frontend_list
+          if grep -q . "${FFILENAME}"; then
+            while read line; do
+            if [ "$line" == "${{ env.slotname }}" ]; then
+              echo "App service slotname is $line"
+              az webapp deployment slot delete --output none --name ${{ env.frontend_app_name }} --resource-group ${{ env.rg_group_name }} --slot $line;
+            fi
+            done < frontend_list
+          fi
+ 
+  Cleanup-ADB2C-Redirect-URL:
+    runs-on: gp-prod-runner-set
+    needs: [Get-Slot-Name, Teardown-Slots]
+    if: ${{ startsWith(github.event.ref, 'feature/') || startsWith(github.event.ref, 'fix/') || startsWith(github.event.ref, 'hotfix/') }}
+    environment:
+      name: Dev
+    env:
+      slotname: ${{ needs.Get-Slot-Name.outputs.slotname }}
+      frontend_app_name: "ase-rms-dev01-uks-02"
+    steps:
+      - name: "Cleaning up Workspace"
+        working-directory: ${{ github.workspace }}
+        run: |
+          echo "Cleaning up previous run"
+          rm -rf *
+          ls -al '${{ github.workspace }}'
+
+      - name: "Log in with Azure 🆔"
+        uses: azure/login@v2
+        with:
+          creds: "${{ secrets.AZURE_CREDENTIALS_ADB2C }}"
+          allow-no-subscriptions: true
+
+      - name: "Remove ADB2C Redirect URL for Dynamic Slot"
+        run: |
+          App_Reg_ObjectId=$(az ad app show --id ${{ vars.NEXT_PUBLIC_MSAL_CLIENT_ID }} --query id --output tsv)
+          MS_Graph_URL="https://graph.microsoft.com/v1.0/applications/$App_Reg_ObjectId"
+          dynamic_slot_redirect_url="https://${{ env.frontend_app_name }}-${{ env.slotname }}.azurewebsites.net/user-registration"
+
+          az ad app show --id ${{ vars.NEXT_PUBLIC_MSAL_CLIENT_ID }} | jq '.spa.redirectUris' > redirect_uri_list.json
+          new_redirect_uri_list=$(jq --arg value_to_delete "$dynamic_slot_redirect_url" 'del(.[] | select(. == $value_to_delete))' redirect_uri_list.json)
+
+          az rest --method "patch" \
+          --uri "$MS_Graph_URL" \
+          --headers "{'Content-Type': 'application/json'}" \
+          --body "{'spa': {'redirectUris': $new_redirect_uri_list}}"
+
+  Delete-Sonar-Project:
+    runs-on: gp-prod-runner-set
+    if: ${{ startsWith(github.event.ref, 'feature/') || startsWith(github.event.ref, 'fix/') || startsWith(github.event.ref, 'hotfix/') }}
+    environment:
+      name: Dev
+    env:
+      sonar_host_url: 'https://devops-platform.mhra.gov.uk/sonarqube'
+      app_name: rc-nextjs-app
+    steps:
+      - name: "Cleaning up Workspace"
+        working-directory: ${{ github.workspace }}
+        run: |
+          echo "Cleaning up previous run"
+          rm -rf *
+          ls -al '${{ github.workspace }}'
+
+      - name: "Generate short ref name"
+        run: |
+          branch_name=$(echo ${{ github.event.ref }} | sed 's/refs\/heads\///g' | sed 's/refs\/tags\///g')
+          echo "branch_name=$branch_name" >> $GITHUB_ENV
+
+      - name: "Encode Sonar Token"
+        run: |
+          Encoded_Token=$(echo -n "${{ secrets.SONAR_TOKEN }}:" | base64)
+          echo "::add-mask::$Encoded_Token"
+          echo "Encoded_Token=$Encoded_Token" >> $GITHUB_ENV
+
+      - name: "Delete Dynamic Sonar Project"
+        run: |
+          branch_name=$(echo ${{ env.branch_name }} | sed 's/\//-/g' )
+          sonar_project_name=${{ env.app_name }}-$branch_name
+
+          curl --request GET --url "${{ env.sonar_host_url }}/api/projects/search?q=${{ env.app_name }}" \
+          --header "Authorization: Basic ${{ env.Encoded_Token }}" > output.json
+
+          if [[ $(jq -r '.components[] | .key' output.json | grep $sonar_project_name) ]]
+          then
+            echo "Delete Sonar Project: $sonar_project_name"
+
+            curl --request POST --url "${{ env.sonar_host_url }}/api/projects/delete?project=$sonar_project_name" \
+            --header "Authorization: Basic ${{ env.Encoded_Token }}"
+          fi

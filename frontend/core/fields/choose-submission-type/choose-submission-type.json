@@ -1,0 +1,16 @@
+[
+  {
+    "identifier": "choose-submission-type",
+    "isCancelButtonRequired": false,
+    "showSubmitButton": false,
+    "sectionName": "",
+    "fields": [
+      {
+        "type": "server-component",
+        "rule": "chooseSubmissionType",
+        "identifier": "choose-submission-type"
+      }
+    ],
+    "route": ""
+  }
+]

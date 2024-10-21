@@ -1,0 +1,149 @@
+name: Delete/Enable Feature Slot SQL Access
+on:
+  workflow_call:
+    inputs:
+      environment:
+        default: "Dev"
+        required: true
+        type: string
+      FUNCTION_APP_NAME:
+        required: true
+        type: string
+      slotname:
+        required: false
+        type: string
+      grantaccess:
+        default: "false"
+        required: false
+        type: string
+    secrets:
+      AZURE_CLIENT_SECRET:
+        required: false
+      AZURE_CLIENT_ID:
+        required: false
+      AZURE_TENANT_ID:
+        required: false
+      AZURE_CREDENTIALS_RC:
+        required: true
+
+jobs:
+  Grant-or-Remove-SQL-DB-access:
+    if: |-
+      ${{ inputs.environment == 'Dev' }}
+    runs-on: GP_PROD
+    env:
+      CREATE_USER: ${{ inputs.grantaccess }}
+      RG_NAME: rg-mhra-dev-uks-rms
+    environment:
+      name: ${{ inputs.environment }}
+    strategy:
+      matrix:
+        FA_Name: ${{ fromJSON(inputs.FUNCTION_APP_NAME) }}
+      max-parallel: 1
+    steps:
+      - name: "Cleaning up Workspace"
+        working-directory: ${{ github.workspace }}
+        run: |
+          echo "Cleaning up previous run"
+          rm -rf *
+          ls -al '${{ github.workspace }}'
+
+      - name: "Log in with Azure 🆔"
+        uses: azure/login@v2
+        with:
+          creds: "${{ secrets.AZURE_CREDENTIALS_RC }}"
+
+      - name: "Read database name from key-vault secret referenced in functionapp app-config"
+        run: |
+          az functionapp deployment slot list --name ${{ matrix.FA_Name }} --resource-group ${{ env.RG_NAME }} | jq -r '.[] | .name' > slot_list.txt
+          if ! [[ $(grep ${{ inputs.slotname }} slot_list.txt) ]]
+          then
+            echo "Deployment slot ${{ inputs.slotname }} doesn't present in Function App ${{ matrix.FA_Name }}"
+            exit 0
+          fi
+
+          Database_Reference=$(az functionapp config appsettings list --name ${{ matrix.FA_Name }} --slot ${{inputs.slotname}} --resource-group ${{ env.RG_NAME }} | jq -r '.[] | select(.name == "SQL_DATABASE_NAME") | .value')
+          KV_NAME=$(echo $Database_Reference | cut -d '/' -f3 | cut -d '.' -f1)
+          KV_SECRET=$(echo $Database_Reference | cut -d '/' -f5)
+
+          DB_NAME=$(az keyvault secret show --name $KV_SECRET --vault-name $KV_NAME | jq -r '.value')
+          echo "DB_NAME=$DB_NAME" >> $GITHUB_ENV
+
+      - name: Execute SQL Query
+        if: ${{ env.DB_NAME != '' }}
+        shell: pwsh
+        run: |
+          Write-Output "Processing Function App: ${{ matrix.FA_Name }}"
+
+          $appId = "${{secrets.AZURE_CLIENT_ID}}"
+          $tenantId = "${{secrets.AZURE_TENANT_ID}}"
+          $password = "${{secrets.AZURE_CLIENT_SECRET}}"
+
+          $slotIdentity = "${{ matrix.FA_Name }}/slots/${{ inputs.slotname }}"
+          
+          $secpasswd = ConvertTo-SecureString $password -AsPlainText -Force
+          $mycreds = New-Object System.Management.Automation.PSCredential ($appId, $secpasswd)
+          $ConnectionString="Data Source=sqldb-rms-dev-uks-01.database.windows.net; Initial Catalog=${{ env.DB_NAME }};"
+          $CheckUserQuery="SELECT * FROM sys.database_principals WHERE name = '$slotIdentity'"
+          $CreateUserQuery="CREATE USER [$slotIdentity] FROM EXTERNAL PROVIDER WITH DEFAULT_SCHEMA=[dbo]; EXEC sp_addrolemember 'db_datawriter', '$slotIdentity'; EXEC sp_addrolemember 'db_datareader', '$slotIdentity';"
+          $DeleteUserQuery="DROP USER [$slotIdentity];"
+            
+          # Login to Azure using SPN
+          Connect-AzAccount -ServicePrincipal -Credential $mycreds -Tenant $tenantId
+          try {
+            # get token
+            $context = Get-AzContext
+            $dexResourceUrl = 'https://database.windows.net/'
+            $token = [Microsoft.Azure.Commands.Common.Authentication.AzureSession]::Instance.AuthenticationFactory.Authenticate($context.Account, 
+                                            $context.Environment, 
+                                            $context.Tenant.Id.ToString(),
+                                            $null, 
+                                            [Microsoft.Azure.Commands.Common.Authentication.ShowDialog]::Never, 
+                                            $null, $dexResourceUrl).AccessToken
+            $SqlConnection = New-Object System.Data.SqlClient.SqlConnection                
+            $SqlCmd = New-Object System.Data.SqlClient.SqlCommand
+            $SqlConnection.ConnectionString = $ConnectionString
+            if ($token) {
+              $SqlConnection.AccessToken = $token
+            }
+            # Start SQL DB connection
+            $SqlConnection.Open()
+            $SqlCmd.Connection = $SqlConnection 
+                      
+            # Check if user exists
+            $SqlCmd.CommandText = $CheckUserQuery
+            $UserExists = $SqlCmd.ExecuteScalar()
+
+            # If the feature slot managed identity exists delete it      
+            if ($UserExists) {
+              # Delete the user if it exists
+              $SqlCmd.CommandText = $DeleteUserQuery
+              $SqlCmd.ExecuteNonQuery()
+            }
+                        
+            # Create the user(Access for feature slot managed identity) if condition is set to true for grantaccess
+            if ($env:CREATE_USER -eq "true") {
+              $SqlCmd.CommandText = $CreateUserQuery
+              $SqlAdapter = New-Object System.Data.SqlClient.SqlDataAdapter
+              $SqlAdapter.SelectCommand = $SqlCmd
+              $DataSet = New-Object System.Data.DataSet
+              $SqlAdapter.Fill($DataSet)
+              # Outputs query
+              $DataSet.Tables
+            }
+          } 
+          catch {
+            Write-Error $_.Exception.Message
+          }
+          finally {
+            if ($SqlAdapter -ne $null) {
+              $SqlAdapter.Dispose()
+            }
+            if ($SqlCmd -ne $null) {
+              $SqlCmd.Dispose()
+            }
+            if ($SqlConnection -ne $null) {
+              $SqlConnection.Dispose()
+            }
+            Disconnect-AzAccount
+          }

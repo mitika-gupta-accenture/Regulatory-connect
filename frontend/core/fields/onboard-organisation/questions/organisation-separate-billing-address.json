@@ -1,0 +1,70 @@
+[
+  {
+    "sectionName": "Onboard an organisation",
+    "identifier": "organisation-separate-billing-address",
+    "question": "Enter your organisation's billing address",
+    "route": "organisation-primary-billing-contact",
+    "fields": [
+      {
+        "identifier": "organisation-address-text-2",
+        "type": "text",
+        "label": "Address line 1",
+        "validations": [
+          {
+            "required": "You must enter address line 1"
+          }
+        ],
+        "errorMessage": "You must enter address line 1",
+        "size": 40
+      },
+      {
+        "identifier": "organisation-address-text-3",
+        "type": "text",
+        "label": "Address line 2 (optional)",
+        "size": 40
+      },
+      {
+        "identifier": "organisation-address-text-4",
+        "type": "text",
+        "label": "Address line 3 (optional)",
+        "size": 40
+      },
+      {
+        "identifier": "organisation-address-text-5",
+        "type": "text",
+        "label": "Address line 4 (optional)",
+        "size": 40
+      },
+      {
+        "identifier": "organisation-address-town-or-city-2",
+        "type": "text",
+        "label": "Town or city",
+        "validations": [
+          {
+            "required": "You must enter a town or city"
+          }
+        ],
+        "errorMessage": "You must enter a town or city",
+        "size": 40
+      },
+      {
+        "identifier": "organisation-address-county-state-or-province-2",
+        "type": "text",
+        "label": "County (optional)",
+        "size": 40
+      },
+      {
+        "identifier": "organisation-address-postcode-or-zip-2",
+        "type": "text",
+        "label": "Postcode",
+        "validations": [
+          {
+            "required": "You must enter your post code"
+          }
+        ],
+        "errorMessage": "You must enter your post code",
+        "size": 20
+      }
+    ]
+  }
+]

@@ -1,0 +1,94 @@
+name: CI
+
+on:
+  workflow_call:
+    inputs:
+      NODE_VERSION:
+        required: true
+        type: string
+      artifact_destination:
+        required: true
+        type: string
+      src_path:
+        required: true
+        type: string
+      app_name:
+        required: true
+        type: string
+jobs:
+  Build-and-Unit-Test:
+    runs-on: GP_PROD
+    env:
+      artifact_destination: ${{ inputs.artifact_destination }}
+    steps:
+      - name: "Cleaning up Workspace"
+        working-directory: ${{ github.workspace }}
+        run: |
+          echo "Cleaning up previous run"
+          rm -rf *
+          ls -al '${{ github.workspace }}'
+
+      - name: "Checkout code ☁️"
+        uses: actions/checkout@v4
+        
+      - name: Set up Node 
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.NODE_VERSION }}
+          cache-dependency-path: .
+          
+      # - name: "Yarn install"
+      #   run: npm install --global yarn 
+
+      - name: "Cache dependencies"
+        id: check-cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ inputs.src_path }}/node_modules
+          key: ${{ github.workspace }}-${{ hashFiles('${{ inputs.src_path }}/package.json') }}
+        
+      - name: "Install node dependencies"
+        if: steps.check-cache.outputs.cache-hit != 'true'
+        working-directory: ${{ inputs.src_path }}
+        run: yarn install --frozen-lockfile
+
+      - name: "Run Unit Tests"
+        working-directory: ${{ inputs.src_path }}
+        run: |
+         echo "Unit Test Run Begins..."
+         yarn run coverage
+
+      - name: "Zip directory for Deploys and SonarQube Scan"
+        run: zip -r ${{ inputs.app_name }}.zip ${{ inputs.src_path }}
+        
+      - name: Publish to Nexus
+        if: env.artifact_destination == 'Nexus'
+        run: |
+          set +x
+          RELEASE_ASSET_FILENAME="${APPLICATION_NAME}-${VERSION}.zip"
+          echo "-----------------------------------------------------------------"
+          echo "Application Name: ${APPLICATION_NAME}"
+          echo "Version: ${VERSION}"
+          echo "Package: ${{ github.workspace }}/${RELEASE_ASSET_FILENAME}"
+          echo "-----------------------------------------------------------------"
+          
+          mvn -D"file=${{ github.workspace }}/${RELEASE_ASSET_FILENAME}" \
+          -D"repositoryId=${REPOSITORY}" \
+          -D"groupId=${GROUP_ID}" \
+          -D"url=https://devops-platform.mhra.gov.uk/nexus/repository/${REPOSITORY}" \
+          -D"packaging=zip" \
+          -D"artifactId=${APPLICATION_NAME}" \
+          -D"version=${VERSION}" \
+          -D"repositoryLayout=default" \
+          deploy:deploy-file -B
+          set -x
+          
+      - name: "Upload artifact"
+        uses: actions/upload-artifact@v4
+        if: env.artifact_destination == 'GH'
+        with:
+          name: ${{ inputs.app_name }}
+          path: |
+            ${{ inputs.app_name }}.zip
+            ${{ github.workspace }}/${{ inputs.src_path }}/coverage/*
+          retention-days: 2

@@ -1,0 +1,20 @@
+[
+  {
+    "sectionName": "Onboard an organisation",
+    "identifier": "organisation-legal-status-uk",
+    "question": "Tell us about your organisation",
+    "route": "organisation-search",
+    "fields": [
+      {
+        "identifier": "organisation-type-radios",
+        "type": "server-component",
+        "rule": "getOrganisationType",
+        "validations": [
+          {
+            "required": "You must select your organisation's legal status"
+          }
+        ]
+      }
+    ]
+  }
+]

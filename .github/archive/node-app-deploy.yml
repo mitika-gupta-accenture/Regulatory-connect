@@ -1,0 +1,250 @@
+name: Deploy
+on:
+  workflow_call:
+    inputs:
+      environment:
+        default: "Dev"
+        required: true
+        type: string
+      FUNCTION_APP_NAME:
+        default: 
+        required: true
+        type: string
+      slot_name_r2:
+        required: false
+        type: string
+      resource_group:
+        default: 
+        required: true
+        type: string
+      keyvault_name:
+        required: false
+        type: string
+      src_path:
+        required: true
+        type: string
+      app_name:
+        required: true
+        type: string
+      config_path:
+        required: false
+        type: string   
+    secrets:
+      AZURE_CREDENTIALS_RC:
+        required: false
+      REPO_READ_PAT:
+        required: false
+    outputs:
+      appurl:
+        description: "Function App URL"
+        value: ${{ jobs.Deployment.outputs.outputurl }}
+      slotname:
+        description: "Deployment Slot Name"
+        value: ${{ jobs.Deployment.outputs.slotname }}
+
+jobs:
+  Deployment:
+    runs-on: GP_PROD
+    environment:
+      name: ${{ inputs.environment }}
+    outputs:
+      slotname: ${{ steps.setslotname.outputs.slotname }}
+      deployment_status: ${{ steps.set-deploy-status.outputs.deployment_status }}
+      deployment_type: ${{ steps.deployment_branch.outputs.deployment_type }}
+      outputurl: ${{ steps.deploy-to-funcapp.outputs.app-url }}${{ steps.deploy-to-funcapp-slot.outputs.app-url }}
+    steps:
+      - name: "Cleaning up Workspace"
+        working-directory: ${{ github.workspace }}
+        run: |
+          echo "Cleaning up previous run"
+          rm -rf *
+          ls -al '${{ github.workspace }}'
+        
+      - name: "Validate Deployment Branch Name"
+        id: deployment_branch
+        run: |
+          if [[ (${{ github.ref }} != 'refs/heads/main' && ${{ github.ref }} != 'refs/heads/develop') && ${{ inputs.environment }} = 'Dev' ]]
+          then
+            echo "deployment_type=feature_slot" >> $GITHUB_OUTPUT
+          elif [[ ${{ github.ref }} = 'refs/heads/develop' ]]
+          then
+            echo "deployment_type=develop" >> $GITHUB_OUTPUT
+          elif [[ ${{ github.ref }} = refs/heads/release* ]]
+          then
+            echo "deployment_type=uat" >> $GITHUB_OUTPUT
+          elif [[ ${{ github.ref }}  = 'refs/heads/main' || ${{ github.ref }} == refs/tags/v* ]]
+          then
+            echo "deployment_type=prod" >> $GITHUB_OUTPUT
+          else
+            echo "Branch naming is not correct"
+          fi
+
+      - name: "Determine Slot Name"
+        env: 
+          environment: ${{ inputs.environment }}
+          deployment_type: ${{ steps.deployment_branch.outputs.deployment_type }}
+        if: ${{ env.deployment_type == 'feature_slot' || env.deployment_type == 'prod' }}
+        id: setslotname
+        run: |
+          if [[ ${{ env.deployment_type }} = "prod" ]]
+          then
+            echo "Setting slotname for Prod Deployment"
+            slotname=${{ inputs.slot_name_r2 }}
+            echo "slotname=$slotname" >> $GITHUB_OUTPUT
+          else
+            echo "Setting slotname for Feature Branch Deployment"
+            if [[ ${{ github.event_name }} = "push" ]]
+            then
+              echo "Github Ref: $GITHUB_REF_NAME"
+              slotname=$(echo $GITHUB_REF_NAME | cut -d '/' -f 2)
+            elif [[ ${{ github.event_name }} = "pull_request" ]]
+            then
+              echo "Github Head: $GITHUB_HEAD_REF"
+              slotname=$(echo $GITHUB_HEAD_REF | cut -d '/' -f 2)
+            else
+              echo "Github event $event_name is invalid"
+            fi
+            echo "slotname before trimming: $slotname"
+            slotname=${slotname:5:19}-$environment
+            if [[ ${slotname:0:1} = '-' ]]; then slotname=${slotname:1}; fi
+            slotname=$(echo $slotname | tr '[:upper:]' '[:lower:]' | sed 's/_/-/g')
+
+            echo "slotname=$slotname" >> $GITHUB_OUTPUT
+          fi
+          echo "The slot name is ${slotname}"
+
+      - name: "Log in with Azure 🆔"
+        uses: azure/login@v2
+        with:
+          creds: "${{ secrets.AZURE_CREDENTIALS_RC }}"
+
+      - name: "Checkout Code"
+        uses: actions/checkout@v4
+
+      - name: "Create Feature-Branch Slot⚡"
+        id: createslot
+        if: ${{ steps.deployment_branch.outputs.deployment_type == 'feature_slot' && steps.setslotname.outcome == 'success' }}
+        working-directory: ${{ inputs.config_path }}
+        env:
+          slotname: ${{ steps.setslotname.outputs.slotname }}
+        run: |
+            az functionapp deployment slot create --name ${{ inputs.FUNCTION_APP_NAME }} --resource-group ${{ inputs.resource_group }} --slot ${{env.slotname}} --configuration-source ${{ inputs.FUNCTION_APP_NAME }}
+           
+            # Enable VDI IP for the slot
+            az functionapp update --resource-group ${{ inputs.resource_group }} --name ${{ inputs.FUNCTION_APP_NAME }} --slot ${{env.slotname}} --set publicNetworkAccess=Enabled
+            az functionapp config access-restriction add --resource-group ${{ inputs.resource_group }} --name ${{ inputs.FUNCTION_APP_NAME }} --slot ${{env.slotname}}  --rule-name "VDI" --action Allow --ip-address 37.130.234.1/32 --priority 101 
+            
+            #Applying app setting config.json to dynamic slot
+            az functionapp config appsettings set -g ${{ inputs.resource_group }} -n ${{ inputs.FUNCTION_APP_NAME }} --slot ${{env.slotname}} --settings @"dev_config.json"
+            
+            # Enable managed identity for the function app
+            az functionapp identity assign --name ${{ inputs.FUNCTION_APP_NAME }} --resource-group ${{ inputs.resource_group }} --slot ${{env.slotname}}
+    
+            # Fetch Object ID of the managed identity
+            object_id=$(az functionapp identity show --name ${{ inputs.FUNCTION_APP_NAME }} --resource-group ${{ inputs.resource_group }} --slot ${{env.slotname}} --query principalId --output tsv)
+    
+            # Add access policy to Key Vault for the managed identity
+            az keyvault set-policy --name ${{ inputs.keyvault_name }} --object-id $object_id --secret-permissions get list --resource-group ${{ inputs.resource_group }}
+
+      - name: "Download build artifacts ⬇️"
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.app_name }}
+
+      - name: "Unzip Artifact"
+        run: unzip -q -o ${{ inputs.app_name }}.zip
+
+      - name: "Zip app directory for App Deploy 💼"
+        working-directory: ${{ inputs.src_path }}
+        run: zip -r deploy.zip .
+
+      - name: 'Deploy ZIP to Azure Function App - ${{ inputs.FUNCTION_APP_NAME }} 🛫'
+        env: 
+          deployment_type: ${{ steps.deployment_branch.outputs.deployment_type }}
+        if: ${{ env.deployment_type == 'develop' || env.deployment_type == 'uat' }}
+        id: deploy-to-funcapp
+        uses: Azure/functions-action@v1
+        with:
+          app-name: ${{ inputs.FUNCTION_APP_NAME }}
+          package: ${{github.workspace}}/${{ inputs.src_path }}/deploy.zip
+
+      - name: 'Deploy ZIP to Azure Function App - ${{ inputs.FUNCTION_APP_NAME }} with ${{ steps.setslotname.outputs.slotname }} Slot 🛫'
+        env: 
+          deployment_type: ${{ steps.deployment_branch.outputs.deployment_type }}
+        if: ${{ env.deployment_type == 'feature_slot' || env.deployment_type == 'prod' }}
+        id: deploy-to-funcapp-slot
+        uses: Azure/functions-action@v1
+        with:
+          app-name: ${{ inputs.FUNCTION_APP_NAME }}
+          package: ${{github.workspace}}/${{ inputs.src_path }}/deploy.zip
+          slot-name: ${{ steps.setslotname.outputs.slotname }}
+
+      - name: 'Set Deployment Status'
+        if: ${{ env.deployment_type == 'uat' ||  env.deployment_type == 'prod' }}
+        id: set-deploy-status
+        env: 
+          deployment_type: ${{ steps.deployment_branch.outputs.deployment_type }}
+        run: |
+          if [[ ${{ steps.deploy-to-funcapp.outcome }} = 'success' || ${{ steps.deploy-to-funcapp-slot.outcome }} = 'success' ]]
+          then
+            echo "${{ env.deployment_type }} has completed, Sending Success Email Notification"
+            echo "deployment_status=success" >> $GITHUB_OUTPUT
+          elif [[ ${{ steps.deploy-to-funcapp.outcome }} = 'failure' || ${{ steps.deploy-to-funcapp-slot.outcome }} = 'failure' ]]
+          then
+            echo "${{ env.deployment_type }} has failed, Sending Failure Email Notification"
+            echo "deployment_status=failure" >> $GITHUB_OUTPUT
+          else
+            echo "Something has failed, please check"
+          fi
+
+  Send-Email:
+    needs: Deployment
+    runs-on: GP_PROD
+    if: ${{ needs.Deployment.outputs.deployment_status != '' }}
+    environment:
+      name: ${{ inputs.environment }}
+    env:
+      deploy_status: ${{ needs.Deployment.outputs.deployment_status }}
+      deployment_type: ${{ needs.Deployment.outputs.deployment_type }}
+      outputurl: ${{ needs.Deployment.outputs.outputurl }}
+    steps:
+
+      - name: "Cleaning up Workspace"
+        working-directory: ${{ github.workspace }}
+        run: |
+          echo "Cleaning up previous run"
+          rm -rf *
+          ls -al '${{ github.workspace }}'
+
+      # ==================================================
+      # Clone the Email template                
+      # ==================================================  
+      - name: 'Clone the Email template Repository'
+        uses: actions/checkout@v4
+        with:
+          repository: MHRA/devops-email-template
+          ref: main
+          path: email-trigger
+          token: ${{ secrets.REPO_READ_PAT }}
+      
+      - name: Python setup
+        uses: actions/setup-python@v3
+
+      - name: ${{ env.deployment_type }} deployment ${{ env.deploy_status }}
+        run: |
+          ## Email template
+          echo '<body><p> Hi,</p>
+          <p>${{github.repository}} - Backend App ${{ inputs.FUNCTION_APP_NAME }} deployment is <b>${{ env.deploy_status }}</b> on ${{ env.deployment_type }} , please check https://github.com/${{github.repository}}/commit/${{github.sha}}/checks/${{github.run_id}} </p>
+          <p><b>Regards,</b></p>
+          <p><b>GitHub Actions</b></p>
+          </body>' > ${{ github.workspace }}/email.html
+
+          ## Send EMAIL
+          todayinDay=$(date +"%A")
+          todayinDatetimestamp=$(TZ=Europe/London date +"%d/%m/%Y %H:%M:%S")
+          mailsubject="${{github.repository}} - Deployment ${{ env.deploy_status }} for Backend App ${{ inputs.FUNCTION_APP_NAME }} on ${{ env.deployment_type }} "
+          mailsubject="${mailsubject} - ${todayinDatetimestamp}"
+          emailcheckoutpath="${{ github.workspace }}/email.html"
+        
+          source ${{ github.workspace }}/email-trigger/rc_recipients_email_list.properties
+          python ${{ github.workspace }}/email-trigger/mail.py "$mailsubject" "$RC_BACKEND_DEV" "$emailcheckoutpath"
